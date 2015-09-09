@@ -1,5 +1,7 @@
 import express from 'express';
 import Redis from 'then-redis';
+import AuctionMessageTranslator from './auction-message-translator'
+
 var debug = require('debug')('goos:Sniper');
 
 const SniperStatus = {Joining: 'Joining', Lost: 'Lost', Bidding: 'Bidding'};
@@ -9,6 +11,9 @@ function main(itemId) {
 
     const app = express();
     let status = SniperStatus.Joining;
+    function auctionClosed() {
+        status = SniperStatus.Lost;
+    }
 
     let subscriber = Redis.createClient();
     let publisher = Redis.createClient();
@@ -16,13 +21,9 @@ function main(itemId) {
     debug("subscribing to auction", Topic);
     publisher.publish(Topic, JSON.stringify({command: "Join"}));
 
+    const translator = AuctionMessageTranslator(auctionClosed);
     subscriber.subscribe(Topic);
-    subscriber.on('message', (channel, jsonMessage) => {
-        debug("received a message on channel", channel, jsonMessage);
-
-        var message = JSON.parse(jsonMessage);
-        if(channel === Topic && message.command === "Status") status = message.status;
-    })
+    subscriber.on('message', translator.processMessage);
 
     app.get('/', function (req, res) {
       res.send(`<html><body><span id="sniper-status">${status}</span></body></html>`);
@@ -40,3 +41,4 @@ export default {
     main,
     SniperStatus
 }
+

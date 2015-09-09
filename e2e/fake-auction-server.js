@@ -28,7 +28,7 @@ export default function FakeAuctionServer(_itemId) {
     }
 
     this.announceClosed = function() {
-        return publisher.publish(topic, JSON.stringify({command: "Status", status: SniperStatus.Lost}));
+        return publisher.publish(topic, JSON.stringify({command: "Close"}));
     }
 
     this.hasReceivedJoinRequestFromSniper = function() {
