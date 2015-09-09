@@ -1,6 +1,7 @@
 import Redis from 'then-redis';
 import Promise from 'promise';
 import retry from 'qretry';
+import {SniperStatus} from '../src/main';
 
 export default function FakeAuctionServer(_itemId) {
     const itemId = _itemId;
@@ -20,7 +21,7 @@ export default function FakeAuctionServer(_itemId) {
     }
 
     this.announceClosed = function() {
-        return auctionHouseClient.publish(topic, {});
+        return auctionHouseClient.publish(topic, SniperStatus.Lost);
     }
 
     this.hasReceivedJoinRequestFromSniper = function() {

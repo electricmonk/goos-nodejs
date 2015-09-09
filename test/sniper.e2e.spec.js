@@ -1,3 +1,5 @@
+require('source-map-support').install();
+
 import Main from '../src/main';
 import FakeAuctionServer from './fake-auction-server';
 import AuctionSniperDriver from './auction-sniper-driver';
