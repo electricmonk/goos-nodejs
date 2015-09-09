@@ -2,7 +2,7 @@ import express from 'express';
 import Redis from 'then-redis';
 import AuctionMessageTranslator from './auction-message-translator'
 import AuctionSniper from './auction-sniper'
-import Message from './message';
+import Auction from './auction'
 
 const debug = require('debug')('goos:Sniper');
 
@@ -50,22 +50,6 @@ function main(itemId) {
 
       console.log('Auction Sniper listening at http://%s:%s', host, port);
     });
-}
-
-function Auction(topic, publisher) {
-    return {
-        bid: function(bid) {
-            sendMessage(Message.Bid(bid));
-        },
-
-        join: function() {
-            sendMessage(Message.Join());
-        }
-    }
-
-    function sendMessage(message) {
-        publisher.publish(topic, JSON.stringify(message));
-    }
 }
 
 export default {
