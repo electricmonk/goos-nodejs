@@ -4,29 +4,43 @@ import AuctionMessageTranslator from './auction-message-translator'
 import AuctionSniper from './auction-sniper'
 import Message from './message';
 
-var debug = require('debug')('goos:Sniper');
+const debug = require('debug')('goos:Sniper');
 
 const SniperStatus = {Joining: 'Joining', Lost: 'Lost', Bidding: 'Bidding'};
 
 function main(itemId) {
     const Topic = `auction-${itemId}`;
 
-    const app = express();
-
     let status = SniperStatus.Joining;
-    function sniperLost() {
-        status = SniperStatus.Lost;
-    }
+
+    const listener = {
+        sniperLost: function() {
+            debug("Setting status to Lost");
+            status = SniperStatus.Lost;
+        },
+
+        sniperBidding: function() {
+            debug("Setting status to Bidding");
+            status = SniperStatus.Bidding;
+        }
+    };
 
     let subscriber = Redis.createClient();
     let publisher = Redis.createClient();
 
-    debug("subscribing to auction", Topic);
     publisher.publish(Topic, JSON.stringify(Message.Join()));
 
-    const translator = AuctionMessageTranslator(new AuctionSniper(this));
+    const auction = {
+        bid: function() {}
+    }
+
+    const translator = AuctionMessageTranslator(new AuctionSniper(auction, listener));
     subscriber.subscribe(Topic);
-    subscriber.on('message', translator.processMessage);
+    subscriber.on('message', (topic, jsonMessage) => {
+        translator.processMessage(topic, JSON.parse(jsonMessage));
+    });
+
+    const app = express();
 
     app.get('/', function (req, res) {
       res.send(`<html><body><span id="sniper-status">${status}</span></body></html>`);

@@ -15,7 +15,7 @@ describe("the auction sniper", () => {
             .then(() => application.startBiddingIn(auction))
             .then(() => auction.hasReceivedJoinRequestFromSniper())
 
-            //.then(() => auction.reportPrice(1000, 98, "other bidder"))
+            .then(() => auction.reportPrice(1000, 98, "other bidder"))
             .then(() => application.hasShownSniperIsBidding())
 
             .then(() => auction.hasReceivedBid(1098))

@@ -2,7 +2,7 @@ import webdriverio from 'webdriverio';
 import retry from 'qretry';
 import {expect} from 'chai';
 
-export default function AuctionSniperDriver(timeoutInMillis) {
+export default function AuctionSniperDriver() {
 
     const options = { desiredCapabilities: { browserName: 'phantomjs', host: '127.0.0.1' } };
     let client = webdriverio.remote(options).init();
