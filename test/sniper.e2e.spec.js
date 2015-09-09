@@ -23,7 +23,7 @@ describe("the auction sniper", () => {
 function ApplicationRunner() {
     let driver;
 
-    this.startBiddingIn = function (auction) {
+    this.startBiddingIn = function(auction) {
         Main.main(auction.itemId);
         driver = new AuctionSniperDriver(1000);
         return driver.showsSniperStatus(Main.SniperStatus.Joining);

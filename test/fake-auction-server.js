@@ -2,31 +2,35 @@ import Redis from 'then-redis';
 import Promise from 'promise';
 import retry from 'qretry';
 import {SniperStatus} from '../src/main';
+var debug = require('debug')('goos:FakeAuctionServer');
 
 export default function FakeAuctionServer(_itemId) {
-    const itemId = _itemId;
-    const testClient = Redis.createClient();
-    const auctionHouseClient = Redis.createClient();
+    this.itemId = _itemId;
+
+    const subscriber = Redis.createClient();
+    const publisher = Redis.createClient();
 
     let topic;
 
-    let subscriptionCount = 0;
-    testClient.on('subscribe', function(channel, count) {
-        if (channel === topic) subscriptionCount = count;
+    let messageCount = 0;
+    subscriber.on('message', (channel, message) => {
+        debug("received a message on channel", channel, message);
+        if (channel === topic) messageCount++;
     });
 
     this.startSellingItem = function() {
-        topic = `auction-${itemId}`;
-        return auctionHouseClient.subscribe(topic);
+        topic = `auction-${this.itemId}`;
+        debug("subscribing to topic", topic);
+        return subscriber.subscribe(topic);
     }
 
     this.announceClosed = function() {
-        return auctionHouseClient.publish(topic, SniperStatus.Lost);
+        return publisher.publish(topic, SniperStatus.Lost);
     }
 
     this.hasReceivedJoinRequestFromSniper = function() {
         return retry(() => new Promise(function(resolve, reject) {
-            if (subscriptionCount < 2)
+            if (!messageCount)
                 reject(new Error("Join request was not received"));
             else
                 resolve();
@@ -34,6 +38,6 @@ export default function FakeAuctionServer(_itemId) {
     }
 
     this.stop = function() {
-        return Promise.all([testClient.quit(), auctionHouseClient.quit()]);
+        return Promise.all([subscriber.quit(), publisher.quit()]);
     }
 }
