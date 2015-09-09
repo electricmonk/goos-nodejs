@@ -29,6 +29,7 @@
     "webdriverio": "^3.2.1"
   },
   "dependencies": {
+    "bluebird": "^2.10.0",
     "debug": "^2.2.0",
     "express": "^4.13.3",
     "redis": "^0.12.1",

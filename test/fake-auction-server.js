@@ -1,7 +1,8 @@
 import Redis from 'then-redis';
-import Promise from 'promise';
+import Promise from 'bluebird';
 import retry from 'qretry';
 import {SniperStatus} from '../src/main';
+import {expect} from 'chai';
 var debug = require('debug')('goos:FakeAuctionServer');
 
 export default function FakeAuctionServer(_itemId) {
@@ -12,10 +13,11 @@ export default function FakeAuctionServer(_itemId) {
 
     let topic;
 
-    let messageCount = 0;
+    var messages = [];
     subscriber.on('message', (channel, message) => {
         debug("received a message on channel", channel, message);
-        if (channel === topic) messageCount++;
+        if (channel === topic) messages.push(message);
+        debug("messages: ", messages);
     });
 
     this.startSellingItem = function() {
@@ -29,15 +31,22 @@ export default function FakeAuctionServer(_itemId) {
     }
 
     this.hasReceivedJoinRequestFromSniper = function() {
-        return retry(() => new Promise(function(resolve, reject) {
-            if (!messageCount)
-                reject(new Error("Join request was not received"));
-            else
-                resolve();
-        }));
+        popAMessage().then(message => {
+            debug("hasReceivedJoinRequestFromSniper: Popped a message: ", message);
+
+            expect(message).to.equal("Join");
+        });
     }
 
     this.stop = function() {
         return Promise.all([subscriber.quit(), publisher.quit()]);
+    }
+
+    function popAMessage() {
+        return retry(() => new Promise((resolve, reject) => {
+            if (!messages.length) reject(new Error("No messages received"));
+
+            return resolve(messages.pop());
+        }));
     }
 }
