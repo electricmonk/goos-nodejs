@@ -1,6 +1,7 @@
 import express from 'express';
 import Redis from 'then-redis';
 import AuctionMessageTranslator from './auction-message-translator'
+import Message from './message';
 
 var debug = require('debug')('goos:Sniper');
 
@@ -19,7 +20,7 @@ function main(itemId) {
     let publisher = Redis.createClient();
 
     debug("subscribing to auction", Topic);
-    publisher.publish(Topic, JSON.stringify({command: "Join"}));
+    publisher.publish(Topic, JSON.stringify(Message.Join()));
 
     const translator = AuctionMessageTranslator(this);
     subscriber.subscribe(Topic);
