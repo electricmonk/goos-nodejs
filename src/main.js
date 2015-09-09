@@ -14,12 +14,14 @@ function main(itemId) {
     let publisher = Redis.createClient();
 
     debug("subscribing to auction", Topic);
-    publisher.publish(Topic, "Join");
+    publisher.publish(Topic, JSON.stringify({command: "Join"}));
 
     subscriber.subscribe(Topic);
-    subscriber.on('message', (channel, message) => {
-        debug("received a message on channel", channel, message);
-        if(channel === Topic && message in SniperStatus) status = message;
+    subscriber.on('message', (channel, jsonMessage) => {
+        debug("received a message on channel", channel, jsonMessage);
+
+        var message = JSON.parse(jsonMessage);
+        if(channel === Topic && message.command === "Status") status = message.status;
     })
 
     app.get('/', function (req, res) {
