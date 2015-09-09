@@ -18,7 +18,7 @@ export default function FakeAuctionServer(_itemId) {
     this.startSellingItem = function() {
         topic = `auction-${this.itemId}`;
 
-        messageQueue = new BlockingQueue(subscriber, topic);
+        messageQueue = new BlockingQueue();
         subscriber.on('message', (channel, jsonMessage) => {
             debug("received a message on channel", channel, jsonMessage);
             if (channel === topic) messageQueue.push(JSON.parse(jsonMessage));
@@ -51,7 +51,7 @@ export default function FakeAuctionServer(_itemId) {
 
 }
 
-function BlockingQueue(topic) {
+function BlockingQueue() {
     var messages = [];
 
     this.push = function(message) {
