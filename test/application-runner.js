@@ -14,6 +14,10 @@ export default function ApplicationRunner() {
         return driver.showsSniperStatus(Main.SniperStatus.Lost);
     }
 
+    this.hasShownSniperIsBidding = function () {
+        return driver.showsSniperStatus(Main.SniperStatus.Bidding);
+    }
+
     this.stop = function () {
         driver && driver.stop();
     }

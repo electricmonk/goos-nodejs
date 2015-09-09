@@ -2,7 +2,7 @@ import express from 'express';
 import Redis from 'then-redis';
 var debug = require('debug')('goos:Sniper');
 
-const SniperStatus = {Joining: 'Joining', Lost: 'Lost'};
+const SniperStatus = {Joining: 'Joining', Lost: 'Lost', Bidding: 'Bidding'};
 
 function main(itemId) {
     const Topic = `auction-${itemId}`;

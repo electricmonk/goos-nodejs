@@ -1,8 +1,7 @@
 require('source-map-support').install();
 
-import Main from '../src/main';
+import ApplicationRunner from './application-runner';
 import FakeAuctionServer from './fake-auction-server';
-import AuctionSniperDriver from './auction-sniper-driver';
 
 describe("the auction sniper", () => {
     var application = new ApplicationRunner();
@@ -15,25 +14,13 @@ describe("the auction sniper", () => {
         return auction.startSellingItem()
             .then(() => application.startBiddingIn(auction))
             .then(() => auction.hasReceivedJoinRequestFromSniper())
+
+            //.then(() => auction.reportPrice(1000, 98, "other bidder"))
+            .then(() => application.hasShownSniperIsBidding())
+
+            .then(() => auction.hasReceivedBid(1098))
+
             .then(() => auction.announceClosed())
             .then(() => application.showsSniperHasLostAuction());
     });
 });
-
-function ApplicationRunner() {
-    let driver;
-
-    this.startBiddingIn = function(auction) {
-        Main.main(auction.itemId);
-        driver = new AuctionSniperDriver(1000);
-        return driver.showsSniperStatus(Main.SniperStatus.Joining);
-    }
-
-    this.showsSniperHasLostAuction = function () {
-        return driver.showsSniperStatus(Main.SniperStatus.Lost);
-    }
-
-    this.stop = function () {
-        driver && driver.stop();
-    }
-}

@@ -9,8 +9,7 @@ export default function AuctionSniperDriver(timeoutInMillis) {
 
     this.showsSniperStatus = function (statusText) {
         return retry(() => client.url("http://localhost:3000/").getText('#sniper-status')
-            .then(text => expect(text).to.equal(statusText, "Sniper Status")))
-            .catch(e => { throw new Error(e.message)})
+            .then(text => expect(text).to.equal(statusText, "Sniper Status")));
     }
 
     this.stop = function() {
