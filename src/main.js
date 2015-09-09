@@ -21,7 +21,7 @@ function main(itemId) {
     debug("subscribing to auction", Topic);
     publisher.publish(Topic, JSON.stringify({command: "Join"}));
 
-    const translator = AuctionMessageTranslator(auctionClosed);
+    const translator = AuctionMessageTranslator(this);
     subscriber.subscribe(Topic);
     subscriber.on('message', translator.processMessage);
 

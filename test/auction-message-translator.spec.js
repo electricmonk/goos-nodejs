@@ -9,7 +9,7 @@ chai.use(SinonChai);
 describe("an auction message translator", () => {
     it("notifies the auction when a close message has been received", () => {
         const auctionClosedListener = sinon.spy();
-        const translator = new AuctionMessageTranslator(auctionClosedListener);
+        const translator = new AuctionMessageTranslator({auctionClosed: auctionClosedListener});
         const message = {command: "Close"};
 
         translator.processMessage(null, message);
