@@ -28,13 +28,11 @@ function main(itemId) {
     let subscriber = Redis.createClient();
     let publisher = Redis.createClient();
 
-    publisher.publish(Topic, JSON.stringify(Message.Join()));
+    const auction = Auction(Topic, publisher);
+    const translator = AuctionMessageTranslator(AuctionSniper(auction, listener));
 
-    const auction = {
-        bid: function() {}
-    }
+    auction.join();
 
-    const translator = AuctionMessageTranslator(new AuctionSniper(auction, listener));
     subscriber.subscribe(Topic);
     subscriber.on('message', (topic, jsonMessage) => {
         translator.processMessage(topic, JSON.parse(jsonMessage));
@@ -52,6 +50,22 @@ function main(itemId) {
 
       console.log('Auction Sniper listening at http://%s:%s', host, port);
     });
+}
+
+function Auction(topic, publisher) {
+    return {
+        bid: function(bid) {
+            sendMessage(Message.Bid(bid));
+        },
+
+        join: function() {
+            sendMessage(Message.Join());
+        }
+    }
+
+    function sendMessage(message) {
+        publisher.publish(topic, JSON.stringify(message));
+    }
 }
 
 export default {

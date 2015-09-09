@@ -9,5 +9,9 @@ export default {
 
     Price: function(currentPrice, increment, bidder) {
         return {command: "Price", currentPrice, increment, bidder}
+    },
+
+    Bid: function(bid) {
+        return {command: "Bid", bid}
     }
 }

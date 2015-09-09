@@ -43,10 +43,10 @@ export default function FakeAuctionServer(_itemId) {
     }
 
     this.hasReceivedBid = function(bid) {
-        //return messageQueue.waitForMessage().then(message => {
-        //    expect(message.command).to.equal("Bid");
-        //    expect(message.bid).to.equal(bid);
-        //})
+        return messageQueue.waitForMessage().then(message => {
+            expect(message.command).to.equal("Bid");
+            expect(message.bid).to.equal(bid, "bid");
+        })
         return Promise.resolve();
     }
 
