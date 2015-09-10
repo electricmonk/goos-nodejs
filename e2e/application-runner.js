@@ -1,15 +1,19 @@
 import AuctionSniperDriver from './auction-sniper-driver';
 import Main from '../src/main';
 import Promise from 'bluebird';
+import childProcess from 'child_process';
+var debug = require('debug')('goos:ApplicationRunner');
 
 export default function ApplicationRunner() {
     let driver;
+    let process;
 
     this.startBiddingIn = function(auction) {
-        driver = new AuctionSniperDriver(1000);
-        const main = Promise.promisify(Main.main);
-        main(auction.itemId)
-            .then(() => driver.showsSniperStatus(Main.SniperStatus.Joining));
+        driver = AuctionSniperDriver();
+
+        process = childProcess.fork('./dist/src/index.js', [auction.itemId]);
+
+        return driver.showsSniperStatus(Main.SniperStatus.Joining);
     }
 
     this.showsSniperHasLostAuction = function () {
@@ -29,7 +33,8 @@ export default function ApplicationRunner() {
     }
 
     this.stop = function () {
-        return Promise.all([driver.stop(), Main.stop()]);
+        process.kill("SIGHUP");
+        return driver.stop();
     }
 
     this.bidderFor = function(itemId) {

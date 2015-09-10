@@ -32,7 +32,7 @@ const SniperListener = {
     }
 };
 
-function main(itemId, started) {
+function main(itemId) {
     const Topic = `auction-${itemId}`;
 
     let subscriber = Redis.createClient();
@@ -60,13 +60,7 @@ function main(itemId, started) {
         var port = server.address().port;
 
         console.log('Auction Sniper listening at http://%s:%s', host, port);
-
-        started();
     });
-}
-
-function stop() {
-    return server.close();
 }
 
 function bidderFor(itemId) {
@@ -76,7 +70,6 @@ function bidderFor(itemId) {
 export default {
     main,
     bidderFor,
-    stop,
     SniperListener,
     SniperStatus
 }
