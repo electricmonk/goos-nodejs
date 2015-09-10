@@ -11,7 +11,7 @@ export default function() {
         showsSniperStatus: function(statusText) {
             const client = webdriverio.remote(options).init();
             return client.url("http://localhost:3000/")
-                .getText('#sniper-status')
+                .getText('table tr td.sniper-status')
                 .then(text => expect(text).to.equal(statusText, "Sniper Status"))
                 .call(() => client.end())
             ;

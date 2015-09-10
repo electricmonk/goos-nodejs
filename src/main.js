@@ -52,7 +52,13 @@ function main(itemId) {
     const app = express();
 
     app.get('/', function (req, res) {
-        res.send(`<html><body><span id="sniper-status">${status}</span></body></html>`);
+        res.send(`<html><body>
+        <table>
+            <tr>
+                <td class="sniper-status">${status}</td>
+            </tr>
+        </table>
+        </body></html>`);
     });
 
     server = app.listen(3000, function () {
