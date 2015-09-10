@@ -5,22 +5,24 @@ const PriceSource = {FromSniper: 'FromSniper', FromOtherBidder: 'FromOtherBidder
 export default {
     PriceSource,
     AuctionSniper: function(auction, sniperListener) {
+        let isWinning = false;
+
         return {
             auctionClosed: function() {
-                sniperListener.sniperLost();
+                isWinning ? sniperListener.sniperWon() : sniperListener.sniperLost();
             },
 
             currentPrice: function(price, increment, priceSource) {
                 debug("currentPrice:", price, ", increment:", increment, ", price source", priceSource);
 
-                switch (priceSource) {
-                    case PriceSource.FromOtherBidder:
-                        auction.bid(price + increment);
-                        sniperListener.sniperBidding();
-                        break;
+                isWinning = priceSource === PriceSource.FromSniper;
 
-                    case PriceSource.FromSniper:
-                        sniperListener.sniperWinning();
+                if (isWinning) {
+                    sniperListener.sniperWinning();
+
+                } else {
+                    auction.bid(price + increment);
+                    sniperListener.sniperBidding();
                 }
             }
         }

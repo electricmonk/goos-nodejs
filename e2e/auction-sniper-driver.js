@@ -1,19 +1,24 @@
 import webdriverio from 'webdriverio';
 import retry from 'qretry';
 import {expect} from 'chai';
+import Promise from 'bluebird';
 
 export default function AuctionSniperDriver() {
 
-    const options = { desiredCapabilities: { browserName: 'phantomjs', host: '127.0.0.1' } };
-    let client = webdriverio.remote(options).init();
+    const options = { desiredCapabilities: { browserName: 'phantomjs'} };
 
     this.showsSniperStatus = function (statusText) {
-        return retry(() => client.url("http://localhost:3000/").getText('#sniper-status')
-            .then(text => expect(text).to.equal(statusText, "Sniper Status")));
+        const client = webdriverio.remote(options).init();
+        return client.url("http://localhost:3000/")
+            .getText('#sniper-status')
+            .then(text => expect(text).to.equal(statusText, "Sniper Status"))
+            .finally(() => client.end())
+        ;
     }
 
     this.stop = function() {
-        return client.end();
+        //return client.end();
+        return Promise.resolve();
     }
 
 }

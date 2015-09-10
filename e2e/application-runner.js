@@ -1,13 +1,15 @@
 import AuctionSniperDriver from './auction-sniper-driver';
 import Main from '../src/main';
+import Promise from 'bluebird';
 
 export default function ApplicationRunner() {
     let driver;
 
     this.startBiddingIn = function(auction) {
-        Main.main(auction.itemId);
         driver = new AuctionSniperDriver(1000);
-        return driver.showsSniperStatus(Main.SniperStatus.Joining);
+        const main = Promise.promisify(Main.main);
+        main(auction.itemId)
+            .then(() => driver.showsSniperStatus(Main.SniperStatus.Joining));
     }
 
     this.showsSniperHasLostAuction = function () {
@@ -27,8 +29,7 @@ export default function ApplicationRunner() {
     }
 
     this.stop = function () {
-        driver && driver.stop();
-        Main.stop();
+        return Promise.all([driver.stop(), Main.stop()]);
     }
 
     this.bidderFor = function(itemId) {
