@@ -1,13 +1,13 @@
 import Message from './message';
 
-export default function Auction(topic, publisher) {
+export default function Auction(topic, publisher, bidder) {
     return {
         bid: function(bid) {
-            sendMessage(Message.Bid(bid));
+            sendMessage(Message.Bid(bidder, bid));
         },
 
         join: function() {
-            sendMessage(Message.Join());
+            sendMessage(Message.Join(bidder));
         }
     }
 

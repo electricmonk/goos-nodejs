@@ -36,18 +36,19 @@ export default function FakeAuctionServer(_itemId) {
         return publisher.publish(topic, JSON.stringify(Message.Price(currentPrice, increment, bidder)));
     }
 
-    this.hasReceivedJoinRequestFromSniper = function() {
-        messageQueue.waitForMessage().then(message => {
+    this.hasReceivedJoinRequestFrom = function(bidder) {
+        return messageQueue.waitForMessage().then(message => {
+            expect(message.bidder).to.equal(bidder);
             expect(message.command).to.equal("Join");
         });
     }
 
-    this.hasReceivedBid = function(bid) {
+    this.hasReceivedBid = function(bid, bidder) {
         return messageQueue.waitForMessage().then(message => {
             expect(message.command).to.equal("Bid");
+            expect(message.bidder).to.equal(bidder);
             expect(message.bid).to.equal(bid, "bid");
-        })
-        return Promise.resolve();
+        });
     }
 
     this.stop = function() {

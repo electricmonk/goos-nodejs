@@ -28,7 +28,7 @@ function main(itemId) {
     let subscriber = Redis.createClient();
     let publisher = Redis.createClient();
 
-    const auction = Auction(Topic, publisher);
+    const auction = Auction(Topic, publisher, bidderFor(itemId));
     const translator = AuctionMessageTranslator(AuctionSniper(auction, listener));
 
     auction.join();
@@ -56,8 +56,13 @@ function stop() {
     server.close();
 }
 
+function bidderFor(itemId) {
+    return `${itemId}@localhost`;
+}
+
 export default {
     main,
+    bidderFor,
     stop,
     SniperStatus
 }

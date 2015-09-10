@@ -1,6 +1,6 @@
 export default {
-    Join: function() {
-        return {command: "Join"};
+    Join: function(bidder) {
+        return {command: "Join", bidder};
     },
 
     Close: function() {
@@ -11,7 +11,7 @@ export default {
         return {command: "Price", currentPrice, increment, bidder}
     },
 
-    Bid: function(bid) {
-        return {command: "Bid", bid}
+    Bid: function(bidder, bid) {
+        return {command: "Bid", bidder, bid}
     }
 }

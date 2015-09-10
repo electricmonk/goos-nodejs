@@ -22,4 +22,8 @@ export default function ApplicationRunner() {
         driver && driver.stop();
         Main.stop();
     }
+
+    this.bidderFor = function(itemId) {
+        return Main.bidderFor(itemId);
+    }
 }
