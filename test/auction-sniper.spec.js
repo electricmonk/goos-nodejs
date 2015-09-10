@@ -1,8 +1,7 @@
 import sinon from 'sinon';
 import SinonChai from 'sinon-chai';
 import chai from 'chai';
-import AuctionSniper from '../src/auction-sniper';
-import {PriceSource} from '../src/auction-message-translator';
+import {AuctionSniper, PriceSource} from '../src/auction-sniper';
 
 const expect = chai.expect;
 chai.use(SinonChai);

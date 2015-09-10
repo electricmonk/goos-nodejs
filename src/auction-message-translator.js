@@ -1,9 +1,7 @@
+import {PriceSource} from '../src/auction-sniper'
 const debug = require('debug')('goos:AuctionMessageTranslator');
-const PriceSource = {FromSniper: 'FromSniper', FromOtherBidder: 'FromOtherBidder'};
 
 export default {
-  PriceSource,
-
   AuctionMessageTranslator: function(sniperId, listener) {
 
       function isFromSniper(message) {

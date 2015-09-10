@@ -1,24 +1,27 @@
-import {PriceSource} from './auction-message-translator'
-
 const debug = require('debug')('goos:AuctionSniper');
 
-export default function(auction, sniperListener) {
-    return {
-        auctionClosed: function() {
-            sniperListener.sniperLost();
-        },
+const PriceSource = {FromSniper: 'FromSniper', FromOtherBidder: 'FromOtherBidder'};
 
-        currentPrice: function(price, increment, priceSource) {
-            debug("currentPrice:", price, ", increment:", increment, ", price source", priceSource);
+export default {
+    PriceSource,
+    AuctionSniper: function(auction, sniperListener) {
+        return {
+            auctionClosed: function() {
+                sniperListener.sniperLost();
+            },
 
-            switch (priceSource) {
-                case PriceSource.FromOtherBidder:
-                    auction.bid(price + increment);
-                    sniperListener.sniperBidding();
-                    break;
+            currentPrice: function(price, increment, priceSource) {
+                debug("currentPrice:", price, ", increment:", increment, ", price source", priceSource);
 
-                case PriceSource.FromSniper:
-                    sniperListener.sniperWinning();
+                switch (priceSource) {
+                    case PriceSource.FromOtherBidder:
+                        auction.bid(price + increment);
+                        sniperListener.sniperBidding();
+                        break;
+
+                    case PriceSource.FromSniper:
+                        sniperListener.sniperWinning();
+                }
             }
         }
     }
