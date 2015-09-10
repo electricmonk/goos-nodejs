@@ -7,11 +7,13 @@ var debug = require('debug')('goos:ApplicationRunner');
 export default function ApplicationRunner() {
     let driver;
     let process;
+    let itemId;
 
     this.startBiddingIn = function(auction) {
-        driver = AuctionSniperDriver();
+        itemId = auction.itemId;
 
-        process = childProcess.fork('./dist/src/index.js', [auction.itemId]);
+        driver = AuctionSniperDriver();
+        process = childProcess.fork('./dist/src/index.js', [itemId]);
 
         return driver.showsSniperStatus(Main.SniperStatus.Joining);
     }
@@ -20,16 +22,16 @@ export default function ApplicationRunner() {
         return driver.showsSniperStatus(Main.SniperStatus.Lost);
     }
 
-    this.hasShownSniperIsBidding = function () {
-        return driver.showsSniperStatus(Main.SniperStatus.Bidding);
+    this.hasShownSniperIsBidding = function (lastPrice, lastBid) {
+        return driver.showsSniperStatus(Main.SniperStatus.Bidding, itemId, lastPrice, lastBid);
     }
 
-    this.hasShownSniperIsWinning = function () {
-        return driver.showsSniperStatus(Main.SniperStatus.Winning);
+    this.hasShownSniperIsWinning = function (winningBid) {
+        return driver.showsSniperStatus(Main.SniperStatus.Winning, itemId, winningBid, winningBid);
     }
 
-    this.showsSniperHasWonAuction = function () {
-        return driver.showsSniperStatus(Main.SniperStatus.Won);
+    this.showsSniperHasWonAuction = function (lastPrice) {
+        return driver.showsSniperStatus(Main.SniperStatus.Won, itemId, lastPrice, lastPrice);
     }
 
     this.stop = function () {

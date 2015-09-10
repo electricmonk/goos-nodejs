@@ -55,7 +55,8 @@ function main(itemId) {
         res.send(`<html><body>
         <table>
             <tr>
-                <td class="sniper-status">${status}</td>
+                <td class="itemId">${itemId}</td>
+                <td class="status">${status}</td>
             </tr>
         </table>
         </body></html>`);

@@ -34,7 +34,7 @@ describe("the auction sniper", () => {
             .then(() => auction.hasReceivedJoinRequestFrom(sniper))
 
             .then(() => auction.reportPrice(1000, 98, "other bidder"))
-            .then(() => application.hasShownSniperIsBidding())
+            .then(() => application.hasShownSniperIsBidding(1000, 98))
 
             .then(() => auction.hasReceivedBid(1098, sniper))
 
@@ -48,14 +48,14 @@ describe("the auction sniper", () => {
             .then(() => auction.hasReceivedJoinRequestFrom(sniper))
 
             .then(() => auction.reportPrice(1000, 98, "other bidder"))
-            .then(() => application.hasShownSniperIsBidding())
+            .then(() => application.hasShownSniperIsBidding(1000, 98))
 
             .then(() => auction.hasReceivedBid(1098, sniper))
 
             .then(() => auction.reportPrice(1098, 97, sniper))
-            .then(() => application.hasShownSniperIsWinning())
+            .then(() => application.hasShownSniperIsWinning(1098))
 
             .then(() => auction.announceClosed())
-            .then(() => application.showsSniperHasWonAuction());
+            .then(() => application.showsSniperHasWonAuction(1098));
     });
 });
