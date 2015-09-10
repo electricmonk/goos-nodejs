@@ -22,6 +22,11 @@ function main(itemId) {
         sniperBidding: function() {
             debug("Setting status to Bidding");
             status = SniperStatus.Bidding;
+        },
+
+        sniperWinning: function() {
+            debug("Setting status to Winning");
+            status = SniperStatus.Winning;
         }
     };
 

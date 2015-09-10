@@ -38,7 +38,11 @@ gulp.task('selenium', function (done) {
 });
 
 
-gulp.task('watch', function () {
+gulp.task('test-watch', ['test'], function () {
+    gulp.watch(sources, ['test']);
+});
+
+gulp.task('e2e-watch', ['e2e'], function () {
     gulp.watch(sources, ['e2e']);
 });
 
