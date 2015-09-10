@@ -37,16 +37,14 @@ export default function FakeAuctionServer(_itemId) {
     }
 
     this.hasReceivedJoinRequestFrom = function(bidder) {
-        return messageQueue.waitForMessage().then(message => {
-            expect(message.bidder).to.equal(bidder);
+        return messageQueue.waitForMessageFrom(bidder).then(message => {
             expect(message.command).to.equal("Join");
         });
     }
 
     this.hasReceivedBid = function(bid, bidder) {
-        return messageQueue.waitForMessage().then(message => {
+        return messageQueue.waitForMessageFrom(bidder).then(message => {
             expect(message.command).to.equal("Bid");
-            expect(message.bidder).to.equal(bidder);
             expect(message.bid).to.equal(bid, "bid");
         });
     }
@@ -64,14 +62,18 @@ function BlockingQueue() {
         messages.push(message);
     }
 
-    this.waitForMessage = function() {
+    this.waitForMessageFrom = function(bidder) {
         return retry(() => new Promise((resolve, reject) => {
             if (!messages.length) {
                 reject(new Error("No messages received"));
             } else {
                 var message = messages.pop();
                 debug("Popped a message: ", message);
-                return resolve(message);
+
+                if (message.bidder === bidder)
+                    return resolve(message);
+                else
+                    reject(new Error(`expected a message from ${bidder}, got a message from ${message.bidder}`));
             }
         }));
     }
