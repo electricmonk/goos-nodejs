@@ -8,6 +8,7 @@ const expect = chai.expect;
 chai.use(SinonChai);
 
 describe("The Auction Sniper", () => {
+    const ItemId = "item";
 
     const sandbox = sinon.sandbox.create();
     let auction;
@@ -17,7 +18,7 @@ describe("The Auction Sniper", () => {
     beforeEach(() => {
         auction = {bid: sandbox.spy()};
         listener = sandbox.stub(SniperListener);
-        sniper = AuctionSniper(auction, listener);
+        sniper = AuctionSniper(ItemId, auction, listener);
     });
 
     afterEach(() => {
@@ -49,11 +50,12 @@ describe("The Auction Sniper", () => {
     it("bids higher and reports bidding when new price arrives", () => {
         const price = 1001;
         const increment = 25;
+        const bid = price + increment;
 
         sniper.currentPrice(price, increment, PriceSource.FromOtherBidder);
 
-        expect(listener.sniperBidding).to.have.been.called;
-        expect(auction.bid).to.have.been.calledWith(price + increment);
+        expect(listener.sniperBidding).to.have.been.calledWith({itemId: ItemId, lastPrice: price, lastBid: bid});
+        expect(auction.bid).to.have.been.calledWith(bid);
     });
 
     it("reports winning when current price comes from sniper", () => {

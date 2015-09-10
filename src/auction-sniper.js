@@ -4,7 +4,7 @@ const PriceSource = {FromSniper: 'FromSniper', FromOtherBidder: 'FromOtherBidder
 
 export default {
     PriceSource,
-    AuctionSniper: function(auction, sniperListener) {
+    AuctionSniper: function(itemId, auction, sniperListener) {
         let isWinning = false;
 
         return {
@@ -21,8 +21,9 @@ export default {
                     sniperListener.sniperWinning();
 
                 } else {
-                    auction.bid(price + increment);
-                    sniperListener.sniperBidding();
+                    const bid = price + increment;
+                    auction.bid(bid);
+                    sniperListener.sniperBidding({itemId, lastPrice: price, lastBid: bid});
                 }
             }
         }

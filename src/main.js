@@ -8,27 +8,39 @@ const debug = require('debug')('goos:Sniper');
 const SniperStatus = {Joining: 'Joining', Lost: 'Lost', Bidding: 'Bidding', Winning: 'Winning', Won: 'Won'};
 let server;
 
-let status = SniperStatus.Joining;
+let currentState = {
+    status: SniperStatus.Joining,
+    lastPrice: undefined,
+    lastBid: undefined,
+    itemId: undefined
+};
+
+function setState(status, itemId, lastPrice, lastBid) {
+    currentState = {
+        status,
+        lastPrice,
+        lastBid,
+        itemId
+    };
+
+    debug("currentState is", currentState);
+}
 
 const SniperListener = {
     sniperLost: function () {
-        debug("Setting status to Lost");
-        status = SniperStatus.Lost;
+        setState(SniperStatus.Lost);
     },
 
-    sniperBidding: function () {
-        debug("Setting status to Bidding");
-        status = SniperStatus.Bidding;
+    sniperBidding: function (newState) {
+        setState(SniperStatus.Bidding, newState.itemId, newState.lastPrice, newState.lastBid);
     },
 
     sniperWinning: function () {
-        debug("Setting status to Winning");
-        status = SniperStatus.Winning;
+        setState(SniperStatus.Winning);
     },
 
     sniperWon: function () {
-        debug("Setting status to Won");
-        status = SniperStatus.Won;
+        setState(SniperStatus.Won);
     }
 };
 
@@ -40,7 +52,7 @@ function main(itemId) {
 
     const sniperId = bidderFor(itemId);
     const auction = Auction(Topic, publisher, sniperId);
-    const translator = AuctionMessageTranslator(sniperId, AuctionSniper(auction, SniperListener));
+    const translator = AuctionMessageTranslator(sniperId, AuctionSniper(itemId, auction, SniperListener));
 
     auction.join();
 
@@ -55,8 +67,8 @@ function main(itemId) {
         res.send(`<html><body>
         <table>
             <tr>
-                <td class="itemId">${itemId}</td>
-                <td class="status">${status}</td>
+                <td class="itemId">${currentState.itemId}</td>
+                <td class="status">${currentState.status}</td>
             </tr>
         </table>
         </body></html>`);
