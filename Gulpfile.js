@@ -51,6 +51,9 @@ gulp.task('test', ['transpile'], function () {
 gulp.task('e2e', ['test', 'selenium'], function () {
     return gulp.src('wdio.conf.js', {read: false})
         .pipe(webdriver({
+            // this is here because gulp-webdriver doesn't deal with a project with a flattened dependency (at the top level) on webdriverio
+            // see https://github.com/webdriverio/gulp-webdriver/issues/20
+            wdioBin: path.join(__dirname, 'node_modules', '.bin', 'wdio'),
             desiredCapabilities: {
                 browserName: 'phantomjs'
             }

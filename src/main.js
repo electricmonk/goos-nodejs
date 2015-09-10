@@ -1,6 +1,6 @@
 import express from 'express';
 import Redis from 'then-redis';
-import AuctionMessageTranslator from './auction-message-translator'
+import {AuctionMessageTranslator} from './auction-message-translator'
 import AuctionSniper from './auction-sniper'
 import Auction from './auction'
 
@@ -28,8 +28,9 @@ function main(itemId) {
     let subscriber = Redis.createClient();
     let publisher = Redis.createClient();
 
-    const auction = Auction(Topic, publisher, bidderFor(itemId));
-    const translator = AuctionMessageTranslator(AuctionSniper(auction, listener));
+    const sniperId = bidderFor(itemId);
+    const auction = Auction(Topic, publisher, sniperId);
+    const translator = AuctionMessageTranslator(sniperId, AuctionSniper(auction, listener));
 
     auction.join();
 
