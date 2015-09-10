@@ -41,4 +41,21 @@ describe("the auction sniper", () => {
             .then(() => auction.announceClosed())
             .then(() => application.showsSniperHasLostAuction());
     });
+
+    it("wins an auction by bidding higher", () => {
+        return auction.startSellingItem()
+            .then(() => application.startBiddingIn(auction))
+            .then(() => auction.hasReceivedJoinRequestFrom(sniper))
+
+            .then(() => auction.reportPrice(1000, 98, "other bidder"))
+            .then(() => application.hasShownSniperIsBidding())
+
+            .then(() => auction.hasReceivedBid(1098, sniper))
+
+            .then(() => auction.reportPrice(1098, 97, sniper))
+            .then(() => application.hasShownSniperIsWinning())
+
+            .then(() => auction.announceClosed())
+            .then(() => application.showsSniperHasWonAuction());
+    });
 });

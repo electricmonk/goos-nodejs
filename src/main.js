@@ -5,7 +5,7 @@ import AuctionSniper from './auction-sniper'
 import Auction from './auction'
 
 const debug = require('debug')('goos:Sniper');
-const SniperStatus = {Joining: 'Joining', Lost: 'Lost', Bidding: 'Bidding'};
+const SniperStatus = {Joining: 'Joining', Lost: 'Lost', Bidding: 'Bidding', Winning: 'Winning', Won: 'Won'};
 let server;
 
 function main(itemId) {

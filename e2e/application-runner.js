@@ -18,6 +18,14 @@ export default function ApplicationRunner() {
         return driver.showsSniperStatus(Main.SniperStatus.Bidding);
     }
 
+    this.hasShownSniperIsWinning = function () {
+        return driver.showsSniperStatus(Main.SniperStatus.Winning);
+    }
+
+    this.showsSniperHasWonAuction = function () {
+        return driver.showsSniperStatus(Main.SniperStatus.Won);
+    }
+
     this.stop = function () {
         driver && driver.stop();
         Main.stop();
