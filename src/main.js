@@ -5,8 +5,8 @@ import AuctionSniper from './auction-sniper'
 import Auction from './auction'
 
 const debug = require('debug')('goos:Sniper');
-
 const SniperStatus = {Joining: 'Joining', Lost: 'Lost', Bidding: 'Bidding'};
+let server;
 
 function main(itemId) {
     const Topic = `auction-${itemId}`;
@@ -44,7 +44,7 @@ function main(itemId) {
       res.send(`<html><body><span id="sniper-status">${status}</span></body></html>`);
     });
 
-    var server = app.listen(3000, function () {
+    server = app.listen(3000, function () {
       var host = server.address().address;
       var port = server.address().port;
 
@@ -52,8 +52,13 @@ function main(itemId) {
     });
 }
 
+function stop() {
+    server.close();
+}
+
 export default {
     main,
+    stop,
     SniperStatus
 }
 

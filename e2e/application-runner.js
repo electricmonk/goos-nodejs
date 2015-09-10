@@ -20,5 +20,6 @@ export default function ApplicationRunner() {
 
     this.stop = function () {
         driver && driver.stop();
+        Main.stop();
     }
 }
