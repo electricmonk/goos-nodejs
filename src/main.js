@@ -1,7 +1,7 @@
 import express from 'express';
 import Redis from 'then-redis';
 import {AuctionMessageTranslator} from './auction-message-translator'
-import AuctionSniper from './auction-sniper'
+import {AuctionSniper} from './auction-sniper'
 import Auction from './auction'
 
 const debug = require('debug')('goos:Sniper');
