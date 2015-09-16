@@ -4,7 +4,6 @@ import sinon from 'sinon';
 import SinonChai from 'sinon-chai';
 import chai from 'chai';
 import {AuctionSniper, PriceSource, SniperState} from '../src/auction-sniper';
-import {SniperListener} from '../src/main'
 
 const expect = chai.expect;
 chai.use(SinonChai);
@@ -19,7 +18,7 @@ describe("The Auction Sniper", () => {
 
     beforeEach(() => {
         auction = {bid: sandbox.spy()};
-        listener = sandbox.stub(SniperListener);
+        listener = {sniperStateChanged: sandbox.spy()};
         sniper = AuctionSniper(ItemId, auction, listener);
     });
 

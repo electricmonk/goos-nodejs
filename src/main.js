@@ -1,24 +1,12 @@
 import express from 'express';
 import Redis from 'then-redis';
-import {AuctionMessageTranslator} from './auction-message-translator'
-import {AuctionSniper, SniperState} from './auction-sniper'
-import Auction from './auction'
+import {AuctionMessageTranslator} from './auction-message-translator';
+import {AuctionSniper, SniperState, SniperSnapshot} from './auction-sniper';
+import Auction from './auction';
+import SnipersTableModel from './snipers-table-model';
 
 const debug = require('debug')('goos:Sniper');
 let server;
-
-let currentState = {
-    status: SniperState.Joining,
-    lastPrice: undefined,
-    lastBid: undefined,
-    itemId: undefined
-};
-
-const SniperListener = {
-    sniperStateChanged: function (newState) {
-        currentState = newState;
-    }
-};
 
 function main(itemId) {
     const Topic = `auction-${itemId}`;
@@ -28,7 +16,8 @@ function main(itemId) {
 
     const sniperId = bidderFor(itemId);
     const auction = Auction(Topic, publisher, sniperId);
-    const translator = AuctionMessageTranslator(sniperId, AuctionSniper(itemId, auction, SniperListener));
+    const snipers = new SnipersTableModel();
+    const translator = AuctionMessageTranslator(sniperId, AuctionSniper(itemId, auction, snipers));
 
     auction.join();
 
@@ -40,16 +29,11 @@ function main(itemId) {
     const app = express();
 
     app.get('/', function (req, res) {
-        res.send(`<html><body>
-        <table>
-            <tr>
-                <td class="itemId">${currentState.itemId}</td>
-                <td class="status">${currentState.status}</td>
-                <td class="lastBid">${currentState.lastBid}</td>
-                <td class="lastPrice">${currentState.lastPrice}</td>
-            </tr>
-        </table>
-        </body></html>`);
+        const table = snipers.render();
+
+        debug("rendered table", table);
+
+        res.send(`<html><body>${table}</body></html>`);
     });
 
     server = app.listen(3000, function () {
@@ -66,7 +50,6 @@ function bidderFor(itemId) {
 
 export default {
     main,
-    bidderFor,
-    SniperListener
+    bidderFor
 }
 

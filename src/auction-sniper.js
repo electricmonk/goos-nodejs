@@ -32,6 +32,7 @@ SniperSnapshot.joining = function(itemId) {
 }
 
 export default {
+    SniperSnapshot,
     PriceSource,
     SniperState,
     AuctionSniper: function(itemId, auction, sniperListener) {
