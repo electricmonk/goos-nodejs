@@ -14,23 +14,9 @@ let currentState = {
     itemId: undefined
 };
 
-function setState(status) {
-    currentState.status = status;
-
-    debug("currentState is", currentState);
-}
-
 const SniperListener = {
-    sniperLost: function () {
-        setState(SniperState.Lost);
-    },
-
     sniperStateChanged: function (newState) {
         currentState = newState;
-    },
-
-    sniperWon: function () {
-        setState(SniperState.Won);
     }
 };
 

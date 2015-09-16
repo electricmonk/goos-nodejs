@@ -31,14 +31,14 @@ describe("The Auction Sniper", () => {
         it("if auction closes immediately", () => {
             sniper.auctionClosed();
 
-            expect(listener.sniperLost).to.have.been.calledOnce;
+            expect(listener.sniperStateChanged).to.have.been.calledWithMatch({status: SniperState.Lost, itemId: ItemId});
         });
 
         it("if auction closes when bidding", () => {
             sniper.currentPrice(123, 45, PriceSource.FromOtherBidder);
             sniper.auctionClosed();
 
-            expect(listener.sniperLost).to.have.been.calledOnce;
+            expect(listener.sniperStateChanged).to.have.been.calledWithMatch({status: SniperState.Lost, itemId: ItemId});
         });
     });
 
@@ -46,7 +46,7 @@ describe("The Auction Sniper", () => {
         sniper.currentPrice(123, 45, PriceSource.FromSniper);
         sniper.auctionClosed();
 
-        expect(listener.sniperWon).to.have.been.calledOnce;
+        expect(listener.sniperStateChanged).to.have.been.calledWithMatch({status: SniperState.Won, itemId: ItemId});
     });
 
     it("bids higher and reports bidding when new price arrives", () => {

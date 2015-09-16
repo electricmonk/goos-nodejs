@@ -20,6 +20,11 @@ class SniperSnapshot {
     bidding(price, bid) {
         return new SniperSnapshot(this.itemId, SniperState.Bidding, price, bid);
     }
+
+    closed() {
+        const state = this.status === SniperState.Winning ? SniperState.Won : SniperState.Lost;
+        return new SniperSnapshot(this.itemId, state, this.lastPrice, this.lastBid);
+    }
 }
 
 SniperSnapshot.joining = function(itemId) {
@@ -31,29 +36,34 @@ export default {
     SniperState,
     AuctionSniper: function(itemId, auction, sniperListener) {
         let snapshot = SniperSnapshot.joining(itemId);
-        let isWinning = false;
+
+        function notifyChange() {
+            sniperListener.sniperStateChanged(snapshot);
+        }
 
         return {
             auctionClosed: function() {
-                isWinning ? sniperListener.sniperWon() : sniperListener.sniperLost();
+                snapshot = snapshot.closed();
+                notifyChange();
             },
 
             currentPrice: function(price, increment, priceSource) {
                 debug("currentPrice:", price, ", increment:", increment, ", price source", priceSource);
 
-                isWinning = priceSource === PriceSource.FromSniper;
+                switch (priceSource) {
+                    case PriceSource.FromSniper:
+                        snapshot = snapshot.winning(price);
+                        break;
 
-                if (isWinning) {
-                    snapshot = snapshot.winning(price);
-
-                } else {
-                    const bid = price + increment;
-                    auction.bid(bid);
-                    snapshot = snapshot.bidding(price, bid);
+                    case PriceSource.FromOtherBidder:
+                        const bid = price + increment;
+                        auction.bid(bid);
+                        snapshot = snapshot.bidding(price, bid);
+                        break;
                 }
 
                 debug("current snapshot", snapshot);
-                sniperListener.sniperStateChanged(snapshot);
+                notifyChange();
             }
         }
     }
