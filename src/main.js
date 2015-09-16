@@ -1,15 +1,14 @@
 import express from 'express';
 import Redis from 'then-redis';
 import {AuctionMessageTranslator} from './auction-message-translator'
-import {AuctionSniper} from './auction-sniper'
+import {AuctionSniper, SniperState} from './auction-sniper'
 import Auction from './auction'
 
 const debug = require('debug')('goos:Sniper');
-const SniperStatus = {Joining: 'Joining', Lost: 'Lost', Bidding: 'Bidding', Winning: 'Winning', Won: 'Won'};
 let server;
 
 let currentState = {
-    status: SniperStatus.Joining,
+    status: SniperState.Joining,
     lastPrice: undefined,
     lastBid: undefined,
     itemId: undefined
@@ -28,19 +27,19 @@ function setState(status, itemId, lastPrice, lastBid) {
 
 const SniperListener = {
     sniperLost: function () {
-        setState(SniperStatus.Lost);
+        setState(SniperState.Lost);
     },
 
-    sniperBidding: function (newState) {
-        setState(SniperStatus.Bidding, newState.itemId, newState.lastPrice, newState.lastBid);
+    sniperStateChanged: function (newState) {
+        currentState = newState;
     },
 
     sniperWinning: function () {
-        setState(SniperStatus.Winning);
+        setState(SniperState.Winning);
     },
 
     sniperWon: function () {
-        setState(SniperStatus.Won);
+        setState(SniperState.Won);
     }
 };
 
@@ -89,7 +88,6 @@ function bidderFor(itemId) {
 export default {
     main,
     bidderFor,
-    SniperListener,
-    SniperStatus
+    SniperListener
 }
 

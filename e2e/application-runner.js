@@ -1,5 +1,6 @@
 import AuctionSniperDriver from './auction-sniper-driver';
 import Main from '../src/main';
+import {SniperState} from '../src/auction-sniper';
 import Promise from 'bluebird';
 import childProcess from 'child_process';
 var debug = require('debug')('goos:ApplicationRunner');
@@ -15,23 +16,23 @@ export default function ApplicationRunner() {
         driver = AuctionSniperDriver();
         process = childProcess.fork('./dist/src/index.js', [itemId]);
 
-        return driver.showsSniperStatus(Main.SniperStatus.Joining);
+        return driver.showsSniperStatus(SniperState.Joining);
     }
 
     this.showsSniperHasLostAuction = function () {
-        return driver.showsSniperStatus(Main.SniperStatus.Lost);
+        return driver.showsSniperStatus(SniperState.Lost);
     }
 
     this.hasShownSniperIsBidding = function (lastPrice, lastBid) {
-        return driver.showsSniperStatus(Main.SniperStatus.Bidding, itemId, lastPrice, lastBid);
+        return driver.showsSniperStatus(SniperState.Bidding, itemId, lastPrice, lastBid);
     }
 
     this.hasShownSniperIsWinning = function (winningBid) {
-        return driver.showsSniperStatus(Main.SniperStatus.Winning, itemId, winningBid, winningBid);
+        return driver.showsSniperStatus(SniperState.Winning, itemId, winningBid, winningBid);
     }
 
     this.showsSniperHasWonAuction = function (lastPrice) {
-        return driver.showsSniperStatus(Main.SniperStatus.Won, itemId, lastPrice, lastPrice);
+        return driver.showsSniperStatus(SniperState.Won, itemId, lastPrice, lastPrice);
     }
 
     this.stop = function () {

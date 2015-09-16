@@ -1,7 +1,6 @@
 import Redis from 'then-redis';
 import Promise from 'bluebird';
 import retry from 'qretry';
-import {SniperStatus} from '../src/main';
 import Message from '../src/message';
 import {expect} from 'chai';
 var debug = require('debug')('goos:FakeAuctionServer');
