@@ -14,13 +14,8 @@ let currentState = {
     itemId: undefined
 };
 
-function setState(status, itemId, lastPrice, lastBid) {
-    currentState = {
-        status,
-        lastPrice,
-        lastBid,
-        itemId
-    };
+function setState(status) {
+    currentState.status = status;
 
     debug("currentState is", currentState);
 }
@@ -32,10 +27,6 @@ const SniperListener = {
 
     sniperStateChanged: function (newState) {
         currentState = newState;
-    },
-
-    sniperWinning: function () {
-        setState(SniperState.Winning);
     },
 
     sniperWon: function () {
@@ -68,6 +59,8 @@ function main(itemId) {
             <tr>
                 <td class="itemId">${currentState.itemId}</td>
                 <td class="status">${currentState.status}</td>
+                <td class="lastBid">${currentState.lastBid}</td>
+                <td class="lastPrice">${currentState.lastPrice}</td>
             </tr>
         </table>
         </body></html>`);

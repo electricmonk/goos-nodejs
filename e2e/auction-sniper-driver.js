@@ -14,7 +14,7 @@ export default function() {
                 if (expected) {
                     return client.getText(selector)
                         .catch(e => { throw new Error(`failed locating element matching selector [${selector}]; ${e}`)})
-                        .then(text => expect(text).to.equal(expected, description))
+                        .then(text => expect(text).to.equal(expected.toString(), description))
 
                 } else {
                     return Promise.resolve();
