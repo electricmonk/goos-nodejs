@@ -36,15 +36,16 @@ export default function FakeAuctionServer(_itemId) {
     }
 
     this.hasReceivedJoinRequestFrom = function(bidder) {
+        debug("Asserting that", topic, "has received join message from", bidder);
         return messageQueue.waitForMessageFrom(bidder).then(message => {
-            expect(message.command).to.equal("Join");
+            return expect(message.command).to.equal("Join");
         });
     }
 
     this.hasReceivedBid = function(bid, bidder) {
         return messageQueue.waitForMessageFrom(bidder).then(message => {
             expect(message.command).to.equal("Bid");
-            expect(message.bid).to.equal(bid, "bid");
+            return expect(message.bid).to.equal(bid, "bid");
         });
     }
 

@@ -1,4 +1,5 @@
 import {SniperSnapshot} from './auction-sniper';
+import _ from 'lodash';
 
 class Column {
     constructor(name, title) {
@@ -11,7 +12,7 @@ class Column {
     }
 
     valueFor(state) {
-        return state[this.name] || '';
+        return state[this.name] || '0';
     }
 }
 
@@ -24,11 +25,21 @@ Column.values = [Column.itemId, Column.status, Column.lastBid, Column.lastPrice]
 export default class SnipersTableModel {
 
     constructor() {
-        this.currentState = SniperSnapshot.joining();
+        this.snipers = [];
     }
 
-    sniperStateChanged(newState) {
-        this.currentState = newState;
+    sniperStateChanged(sniper) {
+        const index = _.findIndex(this.snipers, s => s.isForSameItemAs(sniper));
+
+        if (~index) {
+            this.snipers[index] = sniper;
+        } else {
+            throw new Error("No such sniper: " + sniper);
+        }
+    }
+
+    addSniper(sniper) {
+        this.snipers.push(sniper);
     }
 
     columns() {
@@ -40,11 +51,15 @@ export default class SnipersTableModel {
     }
 
     renderRow(row) {
-        return '<tr>' + this.columns().map(column => this.renderColumn(column, row)).join("") + '</tr>';
+        return `<tr id="auction-${row.itemId}">` + this.columns().map(column => this.renderColumn(column, row)).join("") + '</tr>';
     }
 
     renderTitle() {
         return '<tr>' + this.columns().map(column => `<th>${column.title}</th>`).join("") + '</tr>';
+    }
+
+    renderBody() {
+        return this.snipers.map(sniper => this.renderRow(sniper)).join("\n");
     }
 
     render() {
@@ -53,7 +68,7 @@ export default class SnipersTableModel {
                         ${this.renderTitle()}
                     </thead>
                     <tbody>
-                        ${this.renderRow(this.currentState)}
+                        ${this.renderBody()}
                     </tbody>
                 </table>`;
     }

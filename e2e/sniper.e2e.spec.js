@@ -25,7 +25,7 @@ describe("the auction sniper", () => {
             .then(() => auction.hasReceivedJoinRequestFrom(application.SniperId))
 
             .then(() => auction.announceClosed())
-            .then(() => application.showsSniperHasLostAuction());
+            .then(() => application.showsSniperHasLostAuction(auction));
 
     });
 
@@ -40,7 +40,7 @@ describe("the auction sniper", () => {
             .then(() => auction.hasReceivedBid(1098, application.SniperId))
 
             .then(() => auction.announceClosed())
-            .then(() => application.showsSniperHasLostAuction());
+            .then(() => application.showsSniperHasLostAuction(auction));
     });
 
     it("wins an auction by bidding higher", () => {
@@ -54,28 +54,37 @@ describe("the auction sniper", () => {
             .then(() => auction.hasReceivedBid(1098, application.SniperId))
 
             .then(() => auction.reportPrice(1098, 97, application.SniperId))
-            .then(() => application.hasShownSniperIsWinning(1098))
+            .then(() => application.hasShownSniperIsWinning(auction, 1098))
 
             .then(() => auction.announceClosed())
-            .then(() => application.showsSniperHasWonAuction(1098));
+            .then(() => application.showsSniperHasWonAuction(auction, 1098));
     });
-    //
-    //it("bids for multiple items", () => {
-    //    return auction.startSellingItem()
-    //        .then(() => auction2.startSellingItem())
-    //
-    //        .then(() => application.startBiddingIn(auction, auction2))
-    //        .then(() => auction.hasReceivedJoinRequestFrom(application.SniperId))
-    //
-    //        .then(() => auction.reportPrice(1000, 98, "other bidder"))
-    //        .then(() => application.hasShownSniperIsBidding(auction, 1000, 1098))
-    //
-    //        .then(() => auction.hasReceivedBid(1098, application.SniperId))
-    //
-    //        .then(() => auction.reportPrice(1098, 97, application.SniperId))
-    //        .then(() => application.hasShownSniperIsWinning(1098))
-    //
-    //        .then(() => auction.announceClosed())
-    //        .then(() => application.showsSniperHasWonAuction(1098));
-    //});
+
+    it("bids for multiple items", () => {
+        return auction.startSellingItem()
+            .then(() => auction2.startSellingItem())
+
+            .then(() => application.startBiddingIn(auction, auction2))
+            .then(() => auction.hasReceivedJoinRequestFrom(application.SniperId))
+            .then(() => auction2.hasReceivedJoinRequestFrom(application.SniperId))
+
+            .then(() => auction.reportPrice(1000, 98, "other bidder"))
+            .then(() => auction.hasReceivedBid(1098, application.SniperId))
+
+            .then(() => auction2.reportPrice(500, 21, "other bidder"))
+            .then(() => auction2.hasReceivedBid(521, application.SniperId))
+
+
+            .then(() => auction.reportPrice(1098, 97, application.SniperId))
+            .then(() => auction2.reportPrice(521, 22, application.SniperId))
+
+            .then(() => application.hasShownSniperIsWinning(auction, 1098))
+            .then(() => application.hasShownSniperIsWinning(auction2, 521))
+
+            .then(() => auction.announceClosed())
+            .then(() => auction2.announceClosed())
+
+            .then(() => application.showsSniperHasWonAuction(auction, 1098))
+            .then(() => application.showsSniperHasWonAuction(auction2, 521));
+    });
 });

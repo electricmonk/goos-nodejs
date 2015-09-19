@@ -21,13 +21,14 @@ export default function() {
                 }
             }
 
+            const rowId = "auction-" + itemId;
+
             const client = webdriverio.remote(options).init();
             return client.url("http://localhost:3000/")
-                .then(() => client.elements('table tr'))
-                .then(() => assertElement("Item Status", "td.status", statusText))
-                .then(() => assertElement("Item Id", "td.itemId", itemId))
-                .then(() => assertElement("Last Price", "td.lastPrice", lastPrice))
-                .then(() => assertElement("Last Bid", "td.lastBid", lastBid))
+                .then(() => assertElement("Item Status", `#${rowId} td.status`, statusText))
+                .then(() => assertElement("Item Id", `#${rowId} td.itemId`, itemId))
+                .then(() => assertElement("Last Price", `#${rowId} td.lastPrice`, lastPrice))
+                .then(() => assertElement("Last Bid", `#${rowId} td.lastBid`, lastBid))
                 .call(() => client.end())
             ;
         },

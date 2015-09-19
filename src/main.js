@@ -8,25 +8,30 @@ import SnipersTableModel from './snipers-table-model';
 const debug = require('debug')('goos:Sniper');
 let server;
 
-function main(args) {
+function main() {
     const sniperId = process.argv[2];
-    const itemId = process.argv[3];
-    const Topic = `auction-${itemId}`;
+    const itemIds = process.argv.slice(3);
 
     let subscriber = Redis.createClient();
     let publisher = Redis.createClient();
 
-    const auction = Auction(Topic, publisher, sniperId);
     const snipers = new SnipersTableModel();
-    const translator = AuctionMessageTranslator(sniperId, AuctionSniper(itemId, auction, snipers));
 
-    debug(sniperId, "is joining auction for", itemId);
-    auction.join();
+    function joinAuction(itemId) {
+        snipers.addSniper(SniperSnapshot.joining(itemId));
 
-    subscriber.subscribe(Topic);
-    subscriber.on('message', (topic, jsonMessage) => {
-        translator.processMessage(topic, JSON.parse(jsonMessage));
-    });
+        const Topic = `auction-${itemId}`;
+        const auction = Auction(Topic, publisher, sniperId);
+        const translator = AuctionMessageTranslator(sniperId, AuctionSniper(itemId, auction, snipers));
+        debug(sniperId, "is joining auction for", itemId);
+        auction.join();
+        subscriber.subscribe(Topic);
+        subscriber.on('message', (topic, jsonMessage) => {
+            if (topic == Topic) translator.processMessage(topic, JSON.parse(jsonMessage));
+        });
+    }
+
+    itemIds.forEach(joinAuction);
 
     const app = express();
 

@@ -8,42 +8,36 @@ var debug = require('debug')('goos:ApplicationRunner');
 export default function ApplicationRunner() {
     let driver;
     let process;
-    let itemId;
 
     this.SniperId = "sniper@localhost";
 
-    this.startBiddingIn = function(auction) {
-        itemId = auction.itemId;
+    this.startBiddingIn = function(...auctions) {
+        const items = auctions.map(a => a.itemId);
 
-        debug("starting bidding for item", itemId);
         driver = AuctionSniperDriver();
-        process = childProcess.fork('./dist/src/index.js', [this.SniperId, itemId]);
+        process = childProcess.fork('./dist/src/index.js', [this.SniperId].concat(items));
 
-        return driver.showsSniperStatus(SniperState.Joining);
+        return Promise.all(items.map(item => driver.showsSniperStatus(SniperState.Joining, item)));
     }
 
-    this.showsSniperHasLostAuction = function () {
-        return driver.showsSniperStatus(SniperState.Lost);
+    this.showsSniperHasLostAuction = function (auction) {
+        return driver.showsSniperStatus(SniperState.Lost, auction.itemId);
     }
 
     this.hasShownSniperIsBidding = function (auction, lastPrice, lastBid) {
         return driver.showsSniperStatus(SniperState.Bidding, auction.itemId, lastPrice, lastBid);
     }
 
-    this.hasShownSniperIsWinning = function (winningBid) {
-        return driver.showsSniperStatus(SniperState.Winning, itemId, winningBid, winningBid);
+    this.hasShownSniperIsWinning = function (auction, winningBid) {
+        return driver.showsSniperStatus(SniperState.Winning, auction.itemId, winningBid, winningBid);
     }
 
-    this.showsSniperHasWonAuction = function (lastPrice) {
-        return driver.showsSniperStatus(SniperState.Won, itemId, lastPrice, lastPrice);
+    this.showsSniperHasWonAuction = function (auction, lastPrice) {
+        return driver.showsSniperStatus(SniperState.Won, auction.itemId, lastPrice, lastPrice);
     }
 
     this.stop = function () {
         process.kill("SIGHUP");
         return driver.stop();
-    }
-
-    this.bidderFor = function(itemId) {
-        return Main.bidderFor(itemId);
     }
 }

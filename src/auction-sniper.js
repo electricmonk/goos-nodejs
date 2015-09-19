@@ -25,6 +25,10 @@ class SniperSnapshot {
         const state = this.status === SniperState.Winning ? SniperState.Won : SniperState.Lost;
         return new SniperSnapshot(this.itemId, state, this.lastPrice, this.lastBid);
     }
+
+    isForSameItemAs(other) {
+        return this.itemId === other.itemId;
+    }
 }
 
 SniperSnapshot.joining = function(itemId) {
@@ -41,6 +45,8 @@ export default {
         function notifyChange() {
             sniperListener.sniperStateChanged(snapshot);
         }
+
+        notifyChange();
 
         return {
             auctionClosed: function() {
