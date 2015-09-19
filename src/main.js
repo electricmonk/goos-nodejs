@@ -8,17 +8,19 @@ import SnipersTableModel from './snipers-table-model';
 const debug = require('debug')('goos:Sniper');
 let server;
 
-function main(itemId) {
+function main(args) {
+    const sniperId = process.argv[2];
+    const itemId = process.argv[3];
     const Topic = `auction-${itemId}`;
 
     let subscriber = Redis.createClient();
     let publisher = Redis.createClient();
 
-    const sniperId = bidderFor(itemId);
     const auction = Auction(Topic, publisher, sniperId);
     const snipers = new SnipersTableModel();
     const translator = AuctionMessageTranslator(sniperId, AuctionSniper(itemId, auction, snipers));
 
+    debug(sniperId, "is joining auction for", itemId);
     auction.join();
 
     subscriber.subscribe(Topic);
@@ -44,12 +46,7 @@ function main(itemId) {
     });
 }
 
-function bidderFor(itemId) {
-    return `${itemId}@localhost`;
-}
-
 export default {
     main,
-    bidderFor
 }
 

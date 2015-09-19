@@ -10,11 +10,14 @@ export default function ApplicationRunner() {
     let process;
     let itemId;
 
+    this.SniperId = "sniper@localhost";
+
     this.startBiddingIn = function(auction) {
         itemId = auction.itemId;
 
+        debug("starting bidding for item", itemId);
         driver = AuctionSniperDriver();
-        process = childProcess.fork('./dist/src/index.js', [itemId]);
+        process = childProcess.fork('./dist/src/index.js', [this.SniperId, itemId]);
 
         return driver.showsSniperStatus(SniperState.Joining);
     }
@@ -23,8 +26,8 @@ export default function ApplicationRunner() {
         return driver.showsSniperStatus(SniperState.Lost);
     }
 
-    this.hasShownSniperIsBidding = function (lastPrice, lastBid) {
-        return driver.showsSniperStatus(SniperState.Bidding, itemId, lastPrice, lastBid);
+    this.hasShownSniperIsBidding = function (auction, lastPrice, lastBid) {
+        return driver.showsSniperStatus(SniperState.Bidding, auction.itemId, lastPrice, lastBid);
     }
 
     this.hasShownSniperIsWinning = function (winningBid) {
