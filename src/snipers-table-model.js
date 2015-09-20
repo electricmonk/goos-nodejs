@@ -72,4 +72,25 @@ export default class SnipersTableModel {
                     </tbody>
                 </table>`;
     }
+
+    _buildCell(column, sniper) {
+        return {
+            className: column.className(),
+            text: column.valueFor(sniper)
+        }
+    }
+
+    _buildRow(sniper) {
+        return {
+            id: sniper.itemId,
+            cells: this.columns().map(column => this._buildCell(column, sniper))
+        }
+    }
+
+    table() {
+        return {
+            title: this.columns().map(c => c.title),
+            rows: this.snipers.map(sniper => this._buildRow(sniper))
+        }
+    }
 }

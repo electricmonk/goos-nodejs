@@ -42,7 +42,7 @@ function main() {
     app.set('views', __dirname + '/views');
 
     app.get('/', function (req, res) {
-        res.render('main', {items: snipers.render()});
+        res.render('main', {table: snipers.table()});
     });
 
     app.post('/', urlencodedParser, function (req, res) {
