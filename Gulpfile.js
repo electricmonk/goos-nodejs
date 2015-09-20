@@ -7,14 +7,26 @@ var sourcemaps = require('gulp-sourcemaps');
 var webdriver = require('gulp-webdriver');
 var selenium = require('selenium-standalone');
 
-var sources = ['src/**/*.js', 'test/**/*.js', 'e2e/**/*.js'];
+var paths = {
+    scripts: ['src/**/*.js', 'test/**/*.js', 'e2e/**/*.js'],
+    views: 'src/**/*.handlebars'
+}
 
 gulp.task('clean', function (cb) {
     del(["dist/**/*"], cb)
 });
 
+// Copy all other files to dist directly
+gulp.task('copy', ['clean'], function() {
+    // Copy views
+    gulp.src(paths.views)
+        .pipe(gulp.dest(function (vfile) {
+            return path.join('dist', path.relative(vfile.cwd, vfile.base));
+        }));
+});
+
 gulp.task('transpile', ['clean'], function () {
-    return gulp.src(sources, {nodir: true})
+    return gulp.src(paths.scripts, {nodir: true})
         .pipe(sourcemaps.init())
         .pipe(babel({stage: 0}))
         .pipe(sourcemaps.write('.'))
@@ -22,6 +34,8 @@ gulp.task('transpile', ['clean'], function () {
             return path.join('dist', path.relative(vfile.cwd, vfile.base));
         }));
 });
+
+gulp.task('build', ['copy', 'transpile']);
 
 gulp.task('selenium', function (done) {
   selenium.install({
@@ -39,14 +53,14 @@ gulp.task('selenium', function (done) {
 
 
 gulp.task('test-watch', ['test'], function () {
-    gulp.watch(sources, ['test']);
+    gulp.watch(paths.scripts, ['test']);
 });
 
 gulp.task('e2e-watch', ['e2e'], function () {
-    gulp.watch(sources, ['e2e']);
+    gulp.watch(paths.scripts, ['e2e']);
 });
 
-gulp.task('test', ['transpile'], function () {
+gulp.task('test', ['build'], function () {
     return gulp.src('dist/test/**/*.spec.js', {read: false})
         .pipe(mocha({reporter: 'list'}))
 });

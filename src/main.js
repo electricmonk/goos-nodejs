@@ -5,6 +5,7 @@ import {AuctionMessageTranslator} from './auction-message-translator';
 import {AuctionSniper, SniperState, SniperSnapshot} from './auction-sniper';
 import Auction from './auction';
 import SnipersTableModel from './snipers-table-model';
+import handlebars from 'express-handlebars';
 
 const debug = require('debug')('goos:Sniper');
 let server;
@@ -36,15 +37,12 @@ function main() {
 
     const app = express();
     const urlencodedParser = bodyParser.urlencoded({ extended: false })
+    app.engine('.handlebars', handlebars());
+    app.set('view engine', '.handlebars');
+    app.set('views', __dirname + '/views');
 
     app.get('/', function (req, res) {
-        res.send(`<html><body>
-            <form method="post">
-                <input type="text" name="new-item-id" id="new-item-id"/>
-                <button type="submit" id="join-button" value="Join"/>
-            </form>
-            ${snipers.render()}
-        </body></html>`);
+        res.render('main', {items: snipers.render()});
     });
 
     app.post('/', urlencodedParser, function (req, res) {
