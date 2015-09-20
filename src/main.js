@@ -12,7 +12,6 @@ let server;
 
 function main() {
     const sniperId = process.argv[2];
-    const itemIds = process.argv.slice(3);
 
     let subscriber = Redis.createClient();
     let publisher = Redis.createClient();
@@ -23,17 +22,17 @@ function main() {
         snipers.addSniper(SniperSnapshot.joining(itemId));
 
         const Topic = `auction-${itemId}`;
+
         const auction = Auction(Topic, publisher, sniperId);
-        const translator = AuctionMessageTranslator(sniperId, AuctionSniper(itemId, auction, snipers));
         debug(sniperId, "is joining auction for", itemId);
         auction.join();
+
+        const translator = AuctionMessageTranslator(sniperId, AuctionSniper(itemId, auction, snipers));
         subscriber.subscribe(Topic);
         subscriber.on('message', (topic, jsonMessage) => {
             if (topic == Topic) translator.processMessage(topic, JSON.parse(jsonMessage));
         });
     }
-
-    itemIds.forEach(joinAuction);
 
     const app = express();
     const urlencodedParser = bodyParser.urlencoded({ extended: false })
