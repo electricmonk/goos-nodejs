@@ -13,10 +13,10 @@ const SniperId = "sniper";
 describe("an auction message translator", () => {
     it("notifies the auction when a close message has been received", () => {
         const auctionClosed = sinon.spy();
-        const translator = new AuctionMessageTranslator(SniperId, {auctionClosed});
-        const message = Message.Close();
+        const translator = new AuctionMessageTranslator(SniperId);
+        translator.addListener({auctionClosed});
 
-        translator.processMessage(message);
+        translator.processMessage(Message.Close());
 
         expect(auctionClosed).to.have.been.called;
     });
@@ -24,20 +24,20 @@ describe("an auction message translator", () => {
     describe("notifies bid details when current price message received", () => {
         it("from other bidder", () => {
             const currentPrice = sinon.spy();
-            const translator = new AuctionMessageTranslator(SniperId, {currentPrice});
-            const message = Message.Price(192, 7, "Someone else");
+            const translator = new AuctionMessageTranslator(SniperId);
+            translator.addListener({currentPrice});
 
-            translator.processMessage(message);
+            translator.processMessage(Message.Price(192, 7, "Someone else"));
 
             expect(currentPrice).to.have.been.calledWith(192, 7, PriceSource.FromOtherBidder);
         });
 
         it("from sniper", () => {
             const currentPrice = sinon.spy();
-            const translator = new AuctionMessageTranslator(SniperId, {currentPrice});
-            const message = Message.Price(192, 7, SniperId);
+            const translator = new AuctionMessageTranslator(SniperId);
+            translator.addListener({currentPrice});
 
-            translator.processMessage(message);
+            translator.processMessage(Message.Price(192, 7, SniperId));
 
             expect(currentPrice).to.have.been.calledWith(192, 7, PriceSource.FromSniper);
         });

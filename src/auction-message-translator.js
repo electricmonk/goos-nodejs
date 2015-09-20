@@ -2,9 +2,9 @@ import {PriceSource} from '../src/auction-sniper'
 const debug = require('debug')('goos:AuctionMessageTranslator');
 
 export default class {
-    constructor(sniperId, listener) {
+    constructor(sniperId) {
         this.sniperId = sniperId;
-        this.listener = listener;
+        this.listeners = [];
     }
 
     _isFromSniper(message) {
@@ -13,10 +13,14 @@ export default class {
 
     processMessage(message) {
         if (message.command === 'Close') {
-            this.listener.auctionClosed();
+            this.listeners.forEach(listener => listener.auctionClosed());
 
         } else if (message.command === 'Price') {
-            this.listener.currentPrice(message.currentPrice, message.increment, this._isFromSniper(message));
+            this.listeners.forEach(listener => listener.currentPrice(message.currentPrice, message.increment, this._isFromSniper(message)));
         }
+    }
+
+    addListener(listener) {
+        this.listeners.push(listener);
     }
 }
