@@ -9,6 +9,15 @@ const options = { desiredCapabilities: { browserName: 'phantomjs'} };
 export default function() {
 
     return {
+        startBiddingFor(itemId) {
+            const client = webdriverio.remote(options).init();
+
+            return client.url("http://localhost:3000/")
+                .setValue('#new-item-id', itemId)
+                .click('#join-button')
+                .call(() => client.end());
+        },
+
         showsSniperStatus: function(statusText, itemId, lastPrice, lastBid) {
             function assertElement(description, selector, expected) {
                 if (expected) {

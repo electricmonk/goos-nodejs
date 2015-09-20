@@ -7,17 +7,23 @@ var debug = require('debug')('goos:ApplicationRunner');
 
 export default function ApplicationRunner() {
     let driver;
-    let process;
 
     this.SniperId = "sniper@localhost";
+
+    this.startSniper = function() {
+        this.process = childProcess.fork('./dist/src/index.js', [this.SniperId]);
+    }
 
     this.startBiddingIn = function(...auctions) {
         const items = auctions.map(a => a.itemId);
 
         driver = AuctionSniperDriver();
-        process = childProcess.fork('./dist/src/index.js', [this.SniperId].concat(items));
+        this.startSniper();
 
-        return Promise.all(items.map(item => driver.showsSniperStatus(SniperState.Joining, item)));
+        return Promise.all(items.map(item =>
+            driver.startBiddingFor(item)
+                .then(() => driver.showsSniperStatus(SniperState.Joining, item))
+        ));
     }
 
     this.showsSniperHasLostAuction = function (auction) {
@@ -37,7 +43,7 @@ export default function ApplicationRunner() {
     }
 
     this.stop = function () {
-        process.kill("SIGHUP");
+        this.process.kill("SIGHUP");
         return driver.stop();
     }
 }

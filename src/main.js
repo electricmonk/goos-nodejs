@@ -1,4 +1,5 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import Redis from 'then-redis';
 import {AuctionMessageTranslator} from './auction-message-translator';
 import {AuctionSniper, SniperState, SniperSnapshot} from './auction-sniper';
@@ -34,14 +35,24 @@ function main() {
     itemIds.forEach(joinAuction);
 
     const app = express();
+    const urlencodedParser = bodyParser.urlencoded({ extended: false })
 
     app.get('/', function (req, res) {
-        const table = snipers.render();
-
-        debug("rendered table", table);
-
-        res.send(`<html><body>${table}</body></html>`);
+        res.send(`<html><body>
+            <form method="post">
+                <input type="text" name="new-item-id" id="new-item-id"/>
+                <button type="submit" id="join-button" value="Join"/>
+            </form>
+            ${snipers.render()}
+        </body></html>`);
     });
+
+    app.post('/', urlencodedParser, function (req, res) {
+        const itemId = req.body["new-item-id"];
+        joinAuction(itemId);
+
+        res.redirect("/");
+    })
 
     server = app.listen(3000, function () {
         var host = server.address().address;
