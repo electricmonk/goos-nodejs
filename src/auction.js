@@ -1,17 +1,16 @@
 import Message from './message';
 
-export default function Auction(topic, publisher, bidder) {
-    return {
-        bid: function(bid) {
-            sendMessage(Message.Bid(bidder, bid));
-        },
-
-        join: function() {
-            sendMessage(Message.Join(bidder));
-        }
+export default class Auction {
+    constructor(chat, bidder) {
+        this.chat = chat;
+        this.bidder = bidder;
     }
 
-    function sendMessage(message) {
-        publisher.publish(topic, JSON.stringify(message));
+    bid(bid) {
+        this.chat.sendMessage(Message.Bid(this.bidder, bid));
+    }
+
+    join() {
+        this.chat.sendMessage(Message.Join(this.bidder));
     }
 }

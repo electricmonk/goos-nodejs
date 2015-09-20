@@ -2,7 +2,7 @@ import sinon from 'sinon';
 import SinonChai from 'sinon-chai';
 import chai from 'chai';
 import Message from '../src/message';
-import {AuctionMessageTranslator} from '../src/auction-message-translator'
+import AuctionMessageTranslator from '../src/auction-message-translator'
 import {PriceSource} from '../src/auction-sniper'
 
 const expect = chai.expect;
@@ -16,7 +16,7 @@ describe("an auction message translator", () => {
         const translator = new AuctionMessageTranslator(SniperId, {auctionClosed});
         const message = Message.Close();
 
-        translator.processMessage(null, message);
+        translator.processMessage(message);
 
         expect(auctionClosed).to.have.been.called;
     });
@@ -27,7 +27,7 @@ describe("an auction message translator", () => {
             const translator = new AuctionMessageTranslator(SniperId, {currentPrice});
             const message = Message.Price(192, 7, "Someone else");
 
-            translator.processMessage(null, message);
+            translator.processMessage(message);
 
             expect(currentPrice).to.have.been.calledWith(192, 7, PriceSource.FromOtherBidder);
         });
@@ -37,7 +37,7 @@ describe("an auction message translator", () => {
             const translator = new AuctionMessageTranslator(SniperId, {currentPrice});
             const message = Message.Price(192, 7, SniperId);
 
-            translator.processMessage(null, message);
+            translator.processMessage(message);
 
             expect(currentPrice).to.have.been.calledWith(192, 7, PriceSource.FromSniper);
         });
