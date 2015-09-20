@@ -6,6 +6,8 @@ This project can be seen as a re-interpretation of the GOOS Auction Sniper in No
 * The UI is HTML and served over HTTP using an [express](http://expressjs.com) app.
 * XMPP was abandoned, in favor of [Redis](http://redis.io/) as a message broker, to reduce complexity and use a tool more familiar to JS developer.
 
+As of September 2015, I have finished the project up to and including chapter 16 of GOOS.
+
 ## Running
 1) Install dependencies:
 ```sh
