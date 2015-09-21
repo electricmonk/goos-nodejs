@@ -66,7 +66,7 @@ gulp.task('test', ['build'], function () {
 });
 
 
-gulp.task('e2e', ['test', /*'selenium'*/], function () {
+gulp.task('e2e', ['test', 'selenium'], function () {
     return gulp.src('wdio.conf.js', {read: false})
         .pipe(webdriver({
             // this is here because gulp-webdriver doesn't deal with a project with a flattened dependency (at the top level) on webdriverio
