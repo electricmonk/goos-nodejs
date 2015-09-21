@@ -38,6 +38,7 @@ SniperSnapshot.joining = function(itemId) {
 class AuctionSniper {
     constructor(itemId, auction) {
         this.snapshot = SniperSnapshot.joining(itemId);
+        this.itemId = itemId;
         this.auction = auction;
         this.listeners = [];
 

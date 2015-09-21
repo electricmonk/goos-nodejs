@@ -9,22 +9,28 @@ import handlebars from 'express-handlebars';
 const debug = require('debug')('goos:Sniper');
 let server;
 
-function main() {
+class SniperLauncher {
+    constructor(sniperId) {
+        this.snipers = new SnipersTableModel();
+        this.auctionHouse = new AuctionHouse(sniperId);
+    }
 
-    const snipers = new SnipersTableModel();
-    const auctionHouse = new AuctionHouse(process.argv[2]);
+    joinAuction(itemId) {
 
-    function joinAuction(itemId) {
-        snipers.addSniper(SniperSnapshot.joining(itemId));
+        const auction = this.auctionHouse.anAuctionFor(itemId);
+        const sniper = new AuctionSniper(itemId, auction);
 
-        const auction = auctionHouse.anAuctionFor(itemId);
+        sniper.addListener(this.snipers);
+        auction.addListener(sniper);
+        this.snipers.addSniper(sniper);
 
-        const auctionSniper = new AuctionSniper(itemId, auction);
-        auctionSniper.addListener(snipers);
-
-        auction.addListener(auctionSniper);
         auction.join();
     }
+}
+
+function main() {
+
+    const sniperLauncher = new SniperLauncher(process.argv[2]);
 
     const app = express();
     const urlencodedParser = bodyParser.urlencoded({extended: false});
@@ -33,12 +39,12 @@ function main() {
     app.set('views', __dirname + '/views');
 
     app.get('/', function (req, res) {
-        res.render('main', {table: snipers.table()});
+        res.render('main', {table: sniperLauncher.snipers.table()});
     });
 
     app.post('/', urlencodedParser, function (req, res) {
         const itemId = req.body["new-item-id"];
-        joinAuction(itemId);
+        sniperLauncher.joinAuction(itemId);
 
         res.redirect("/");
     })

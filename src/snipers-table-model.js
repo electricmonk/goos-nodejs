@@ -25,72 +25,45 @@ Column.values = [Column.itemId, Column.status, Column.lastBid, Column.lastPrice]
 export default class SnipersTableModel {
 
     constructor() {
-        this.snipers = [];
+        this.snapshots = [];
     }
 
-    sniperStateChanged(sniper) {
-        const index = _.findIndex(this.snipers, s => s.isForSameItemAs(sniper));
+    sniperStateChanged(snapshot) {
+        const index = _.findIndex(this.snapshots, s => s.isForSameItemAs(snapshot));
 
         if (~index) {
-            this.snipers[index] = sniper;
+            this.snapshots[index] = snapshot;
         } else {
-            throw new Error("No such sniper: " + sniper);
+            throw new Error("No such snapshot: " + snapshot);
         }
     }
 
     addSniper(sniper) {
-        this.snipers.push(sniper);
+        this.snapshots.push(sniper.snapshot);
     }
 
     columns() {
         return Column.values;
     }
 
-    renderColumn(column, row) {
-        return `<td class=${column.className()}>${column.valueFor(row)}</td>`;
-    }
-
-    renderRow(row) {
-        return `<tr id="auction-${row.itemId}">` + this.columns().map(column => this.renderColumn(column, row)).join("") + '</tr>';
-    }
-
-    renderTitle() {
-        return '<tr>' + this.columns().map(column => `<th>${column.title}</th>`).join("") + '</tr>';
-    }
-
-    renderBody() {
-        return this.snipers.map(sniper => this.renderRow(sniper)).join("\n");
-    }
-
-    render() {
-        return `<table border="1">
-                    <thead>
-                        ${this.renderTitle()}
-                    </thead>
-                    <tbody>
-                        ${this.renderBody()}
-                    </tbody>
-                </table>`;
-    }
-
-    _buildCell(column, sniper) {
+    _buildCell(column, snapshot) {
         return {
             className: column.className(),
-            text: column.valueFor(sniper)
+            text: column.valueFor(snapshot)
         }
     }
 
-    _buildRow(sniper) {
+    _buildRow(snapshot) {
         return {
-            id: sniper.itemId,
-            cells: this.columns().map(column => this._buildCell(column, sniper))
+            id: snapshot.itemId,
+            cells: this.columns().map(column => this._buildCell(column, snapshot))
         }
     }
 
     table() {
         return {
             title: this.columns().map(c => c.title),
-            rows: this.snipers.map(sniper => this._buildRow(sniper))
+            rows: this.snapshots.map(snapshot => this._buildRow(snapshot))
         }
     }
 }

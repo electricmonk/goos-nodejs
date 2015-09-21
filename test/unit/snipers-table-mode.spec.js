@@ -3,7 +3,7 @@ require('source-map-support').install();
 import chai from 'chai';
 import chaiThings from 'chai-things';
 import SnipersTableModel from '../../src/snipers-table-model';
-import {SniperSnapshot, SniperState} from '../../src/auction-sniper';
+import {SniperSnapshot, AuctionSniper, SniperState} from '../../src/auction-sniper';
 
 const expect = chai.expect;
 chai.use(chaiThings);
@@ -13,10 +13,8 @@ chai.Assertion.addMethod("row", function(num, id, cells) {
 
     this.assert(
         row.id === id,
-        "expected #{this} to be of type #{exp} but got #{act}",
-        "expected #{this} to not be of type #{act}",
-        id,
-        row.id
+        `expected ${JSON.stringify(row)} to have id ${id} but got ${row.id}`,
+        `expected ${JSON.stringify(row)} to not have id ${id} but got ${row.id}`
     );
 
     cells.forEach(cell => {
@@ -30,25 +28,25 @@ chai.Assertion.addMethod("row", function(num, id, cells) {
 
 describe("the snipers table model", () => {
     let model;
+    let sniper;
+    const itemId = "some-item";
 
-    beforeEach("create a new table model", () => {
-        model = new SnipersTableModel();
-    })
+    beforeEach("create a new table model", () => model = new SnipersTableModel());
+    beforeEach("create a new sniper", () => sniper = new AuctionSniper("item-1234"));
 
     it("has a title row", () => {
         expect(model.table().title).to.eql(["Item Id", "Status", "Last Bid", "Last Price"]);
     });
 
     it("includes a new sniper", () => {
-        const itemId = "some-item";
         const price = 1000;
         const bid = 15;
-        const snapshot = new SniperSnapshot.joining(itemId).bidding(price, bid);
 
-        model.addSniper(snapshot);
+        model.addSniper(sniper);
+        model.sniperStateChanged(sniper.snapshot.bidding(price, bid));
 
-        expect(model.table()).to.have.row(0, itemId, [
-            {className: "itemId", text: itemId},
+        expect(model.table()).to.have.row(0, sniper.itemId, [
+            {className: "itemId", text: sniper.itemId},
             {className: "status", text: SniperState.Bidding},
             {className: "lastBid", text: bid},
             {className: "lastPrice", text: price}]);
@@ -56,17 +54,15 @@ describe("the snipers table model", () => {
 
 
     it("updates correct sniper state", () => {
-        const item1 = "some-item";
-        const item2 = "some-other-item";
-        const snapshot = SniperSnapshot.joining(item1);
+        const sniper2 = new AuctionSniper("some-other-item");
 
-        model.addSniper(snapshot);
-        model.addSniper(SniperSnapshot.joining(item2));
+        model.addSniper(sniper);
+        model.addSniper(sniper2);
 
-        model.sniperStateChanged(snapshot.bidding(1, 2));
+        model.sniperStateChanged(sniper.snapshot.bidding(1, 2));
 
-        expect(model.table()).to.have.row(0, item1, [{className: "status", text: SniperState.Bidding}])
-            .and.to.have.row(1, item2, [{className: "status", text: SniperState.Joining}])
+        expect(model.table()).to.have.row(0, sniper.itemId, [{className: "status", text: SniperState.Bidding}])
+            .and.to.have.row(1, sniper2.itemId, [{className: "status", text: SniperState.Joining}])
     });
 
     it("explodes if there's not sniper to updated", () => {
