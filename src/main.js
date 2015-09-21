@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import Redis from 'then-redis';
 import {AuctionSniper, SniperState, SniperSnapshot} from './auction-sniper';
-import Auction from './auction';
+import AuctionHouse from './auction-house';
 import SnipersTableModel from './snipers-table-model';
 import handlebars from 'express-handlebars';
 
@@ -10,23 +10,19 @@ const debug = require('debug')('goos:Sniper');
 let server;
 
 function main() {
-    const sniperId = process.argv[2];
-
-    const subscriber = Redis.createClient();
-    const publisher = Redis.createClient();
 
     const snipers = new SnipersTableModel();
+    const auctionHouse = new AuctionHouse(process.argv[2]);
 
     function joinAuction(itemId) {
         snipers.addSniper(SniperSnapshot.joining(itemId));
 
-        const auction = new Auction(publisher, subscriber, itemId, sniperId);
+        const auction = auctionHouse.anAuctionFor(itemId);
+
         const auctionSniper = new AuctionSniper(itemId, auction);
         auctionSniper.addListener(snipers);
 
         auction.addListener(auctionSniper);
-
-        debug(sniperId, "is joining auction for", itemId);
         auction.join();
     }
 
