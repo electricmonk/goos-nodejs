@@ -19,7 +19,8 @@ describe("The Auction Sniper", () => {
     beforeEach(() => {
         auction = {bid: sandbox.spy()};
         listener = {sniperStateChanged: sandbox.spy()};
-        sniper = AuctionSniper(ItemId, auction, listener);
+        sniper = new AuctionSniper(ItemId, auction);
+        sniper.addListener(listener);
     });
 
     afterEach(() => {

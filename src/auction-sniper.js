@@ -35,43 +35,53 @@ SniperSnapshot.joining = function(itemId) {
     return new SniperSnapshot(itemId, SniperState.Joining);
 }
 
+class AuctionSniper {
+    constructor(itemId, auction) {
+        this.snapshot = SniperSnapshot.joining(itemId);
+        this.auction = auction;
+        this.listeners = [];
+
+        this._notifyChange();
+    }
+
+    _notifyChange() {
+        this.listeners.forEach(listener => listener.sniperStateChanged(this.snapshot));
+    }
+
+    addListener(listener) {
+        this.listeners.push(listener);
+    }
+
+    auctionClosed() {
+        this.snapshot = this.snapshot.closed();
+        this._notifyChange();
+    }
+
+    currentPrice(price, increment, priceSource) {
+        debug("currentPrice:", price, ", increment:", increment, ", price source", priceSource);
+
+        switch (priceSource) {
+            case PriceSource.FromSniper:
+                this.snapshot = this.snapshot.winning(price);
+                break;
+
+            case PriceSource.FromOtherBidder:
+                const bid = price + increment;
+                this.auction.bid(bid);
+                this.snapshot = this.snapshot.bidding(price, bid);
+                break;
+        }
+
+        debug("current snapshot", this.snapshot);
+        this._notifyChange();
+    }
+
+
+}
+
 export default {
     SniperSnapshot,
     PriceSource,
     SniperState,
-    AuctionSniper: function(itemId, auction, sniperListener) {
-        let snapshot = SniperSnapshot.joining(itemId);
-
-        function notifyChange() {
-            sniperListener.sniperStateChanged(snapshot);
-        }
-
-        notifyChange();
-
-        return {
-            auctionClosed: function() {
-                snapshot = snapshot.closed();
-                notifyChange();
-            },
-
-            currentPrice: function(price, increment, priceSource) {
-                debug("currentPrice:", price, ", increment:", increment, ", price source", priceSource);
-
-                switch (priceSource) {
-                    case PriceSource.FromSniper:
-                        snapshot = snapshot.winning(price);
-                        break;
-
-                    case PriceSource.FromOtherBidder:
-                        const bid = price + increment;
-                        auction.bid(bid);
-                        snapshot = snapshot.bidding(price, bid);
-                        break;
-                }
-
-                debug("current snapshot", snapshot);
-                notifyChange();
-            }
-        }
-    }
+    AuctionSniper
 }

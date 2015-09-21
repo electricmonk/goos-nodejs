@@ -21,7 +21,8 @@ function main() {
         snipers.addSniper(SniperSnapshot.joining(itemId));
 
         const auction = new Auction(publisher, subscriber, itemId, sniperId);
-        const auctionSniper = AuctionSniper(itemId, auction, snipers);
+        const auctionSniper = new AuctionSniper(itemId, auction);
+        auctionSniper.addListener(snipers);
 
         auction.addListener(auctionSniper);
 
@@ -30,7 +31,7 @@ function main() {
     }
 
     const app = express();
-    const urlencodedParser = bodyParser.urlencoded({extended: false})
+    const urlencodedParser = bodyParser.urlencoded({extended: false});
     app.engine('.handlebars', handlebars());
     app.set('view engine', '.handlebars');
     app.set('views', __dirname + '/views');
