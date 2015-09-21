@@ -12,8 +12,8 @@ let server;
 function main() {
     const sniperId = process.argv[2];
 
-    let subscriber = Redis.createClient();
-    let publisher = Redis.createClient();
+    const subscriber = Redis.createClient();
+    const publisher = Redis.createClient();
 
     const snipers = new SnipersTableModel();
 

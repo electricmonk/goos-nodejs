@@ -61,7 +61,7 @@ gulp.task('e2e-watch', ['e2e'], function () {
 });
 
 gulp.task('test', ['build'], function () {
-    return gulp.src('dist/test/unit/**/*.spec.js', {read: false})
+    return gulp.src(['dist/test/unit/**/*.spec.js', 'dist/test/integration/**/*.spec.js'], {read: false})
         .pipe(mocha({reporter: 'list'}))
 });
 
