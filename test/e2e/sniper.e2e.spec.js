@@ -1,7 +1,7 @@
 require('source-map-support').install();
 
-import ApplicationRunner from './application-runner';
-import FakeAuctionServer from './fake-auction-server';
+import ApplicationRunner from '../drivers/application-runner';
+import FakeAuctionServer from '../drivers/fake-auction-server';
 
 describe("the auction sniper", () => {
     let application;

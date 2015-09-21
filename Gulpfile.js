@@ -8,7 +8,7 @@ var webdriver = require('gulp-webdriver');
 var selenium = require('selenium-standalone');
 
 var paths = {
-    scripts: ['src/**/*.js', 'test/**/*.js', 'e2e/**/*.js'],
+    scripts: ['src/**/*.js', 'test/**/*.js'],
     views: 'src/**/*.handlebars'
 }
 
@@ -61,7 +61,7 @@ gulp.task('e2e-watch', ['e2e'], function () {
 });
 
 gulp.task('test', ['build'], function () {
-    return gulp.src('dist/test/**/*.spec.js', {read: false})
+    return gulp.src('dist/test/unit/**/*.spec.js', {read: false})
         .pipe(mocha({reporter: 'list'}))
 });
 

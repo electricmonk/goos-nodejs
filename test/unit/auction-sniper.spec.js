@@ -3,7 +3,7 @@ require('source-map-support').install();
 import sinon from 'sinon';
 import SinonChai from 'sinon-chai';
 import chai from 'chai';
-import {AuctionSniper, PriceSource, SniperState} from '../src/auction-sniper';
+import {AuctionSniper, PriceSource, SniperState} from '../../src/auction-sniper';
 
 const expect = chai.expect;
 chai.use(SinonChai);

@@ -2,8 +2,8 @@ require('source-map-support').install();
 
 import chai from 'chai';
 import chaiThings from 'chai-things';
-import SnipersTableModel from '../src/snipers-table-model';
-import {SniperSnapshot, SniperState} from '../src/auction-sniper';
+import SnipersTableModel from '../../src/snipers-table-model';
+import {SniperSnapshot, SniperState} from '../../src/auction-sniper';
 
 const expect = chai.expect;
 chai.use(chaiThings);
