@@ -38,8 +38,10 @@ export default class SnipersTableModel {
         }
     }
 
-    addSniper(sniper) {
+    sniperAdded(sniper) {
         this.snapshots.push(sniper.snapshot);
+        sniper.addListener(this);
+
     }
 
     columns() {

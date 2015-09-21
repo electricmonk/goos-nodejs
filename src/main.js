@@ -1,17 +1,19 @@
 import express from 'express';
+import handlebars from 'express-handlebars';
 import bodyParser from 'body-parser';
 import Redis from 'then-redis';
-import {AuctionSniper, SniperState, SniperSnapshot} from './auction-sniper';
+
+import {AuctionSniper} from './auction-sniper';
 import AuctionHouse from './auction-house';
 import SnipersTableModel from './snipers-table-model';
-import handlebars from 'express-handlebars';
+import SniperPortfolio from './sniper-portfolio';
 
 const debug = require('debug')('goos:Sniper');
 let server;
 
 class SniperLauncher {
-    constructor(sniperId) {
-        this.snipers = new SnipersTableModel();
+    constructor(snipers, sniperId) {
+        this.snipers = snipers
         this.auctionHouse = new AuctionHouse(sniperId);
     }
 
@@ -20,7 +22,6 @@ class SniperLauncher {
         const auction = this.auctionHouse.anAuctionFor(itemId);
         const sniper = new AuctionSniper(itemId, auction);
 
-        sniper.addListener(this.snipers);
         auction.addListener(sniper);
         this.snipers.addSniper(sniper);
 
@@ -30,7 +31,10 @@ class SniperLauncher {
 
 function main() {
 
-    const sniperLauncher = new SniperLauncher(process.argv[2]);
+    const snipers = new SnipersTableModel();
+    const portfolio = new SniperPortfolio();
+    portfolio.addListener(snipers);
+    const sniperLauncher = new SniperLauncher(portfolio, process.argv[2]);
 
     const app = express();
     const urlencodedParser = bodyParser.urlencoded({extended: false});
@@ -39,7 +43,7 @@ function main() {
     app.set('views', __dirname + '/views');
 
     app.get('/', function (req, res) {
-        res.render('main', {table: sniperLauncher.snipers.table()});
+        res.render('main', {table: snipers.table()});
     });
 
     app.post('/', urlencodedParser, function (req, res) {

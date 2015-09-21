@@ -42,7 +42,7 @@ describe("the snipers table model", () => {
         const price = 1000;
         const bid = 15;
 
-        model.addSniper(sniper);
+        model.sniperAdded(sniper);
         model.sniperStateChanged(sniper.snapshot.bidding(price, bid));
 
         expect(model.table()).to.have.row(0, sniper.itemId, [
@@ -56,8 +56,8 @@ describe("the snipers table model", () => {
     it("updates correct sniper state", () => {
         const sniper2 = new AuctionSniper("some-other-item");
 
-        model.addSniper(sniper);
-        model.addSniper(sniper2);
+        model.sniperAdded(sniper);
+        model.sniperAdded(sniper2);
 
         model.sniperStateChanged(sniper.snapshot.bidding(1, 2));
 
